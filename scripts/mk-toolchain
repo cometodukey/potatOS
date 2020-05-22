@@ -12,7 +12,7 @@ GDB_URL="https://ftp.gnu.org/gnu/gdb/$GDB.tar.xz"
 GCC_URL="ftp://ftp.mirrorservice.org/sites/sourceware.org/pub/gcc/releases/gcc-$GCC_VERSION/$GCC.tar.xz"
 BINUTILS_URL="https://mirrors.tripadvisor.com/gnu/binutils/$BINUTILS.tar.xz"
 
-PREFIX="toolchain/i686-tools"
+PREFIX="$PWD/toolchain/i686-tools"
 TARGET="i686-elf"
 
 get_sources() {
@@ -33,7 +33,7 @@ build_and_install_binutils() {
     cd "$dir/build"
 
     ../configure                \
-            --prefix "$PWD/$PREFIX"  \
+            --prefix "$PREFIX"  \
             --disable-nls       \
             --with-sysroot      \
             --disable-werror    \
@@ -51,7 +51,7 @@ build_and_install_gcc() {
     cd "$dir/build"
 
     ../configure                    \
-            --prefix "$PWD/$PREFIX"      \
+            --prefix "$PREFIX"      \
             --without-headers       \
             --enable-languages=c    \
             --disable-multilib      \
@@ -74,7 +74,7 @@ build_and_install_gdb() {
     cd "$dir/build"
 
     ../configure                \
-            --prefix "$PWD/$PREFIX"  \
+            --prefix "$PREFIX"  \
             --target "$TARGET"
 
     make
@@ -92,8 +92,8 @@ main() {
     # exit if any commands fail
     set -e
 
-    mkdir -p "../$PREFIX"
-    cd ../toolchain
+    mkdir -p "$PREFIX"
+    cd toolchain
 
     get_sources
     inflate_tarballs
