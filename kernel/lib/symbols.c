@@ -38,19 +38,11 @@ init_symlist(MultibootModule *kernelsyms) {
                 for (; i; --i, ++counter) {
                     kprintf("here %u\r\n", counter);
                     c = consume(syms);
-                    // if (c == '\n') {
-                    //     hang();
-                    // }
-                    // kputchar(c);
-                    // kprint_flush();
-                    // UNUSED(name); UNUSED(num);
-                    /* end of line */
                     if (c == '\n') {
                         memcpy(base, &num, sizeof(num));
                         base[sizeof(num)] = ' ';
                         memmove(base+sizeof(num)+1, name, base-name);
                         base[base-name] = '\0';
-                        // consume(syms);
                         continue;
                     } else if (!isprint(c)) {
                         kputs("kernel.symlist is invalid! expected a printable character or LF");

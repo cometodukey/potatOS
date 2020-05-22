@@ -8,7 +8,7 @@ static void gdt_entry(int32_t num, uint32_t base,
                          uint32_t limit, uint8_t access, uint8_t gran);
 
 static GDTPtr gdt_ptr;
-static GDTDescriptor gdt_entries[5] = {0};
+static GDTDescriptor gdt_entries[5] = {{0}};
 
 void
 init_gdt(void) {

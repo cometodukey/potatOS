@@ -3,8 +3,8 @@ TOOLCHAIN_DIR = ../toolchain/i686-tools
 STATIC_CFLAGS =  -Wall -Wextra -Wpedantic -Werror
 STATIC_CFLAGS += -std=c11 -ffreestanding -nostdlib -nostartfiles
 STATIC_CFLAGS += -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -mno-80387 -m32 -march=i686 -fPIE
-STATIC_CFLAGS += -fno-stack-protector -fno-omit-frame-pointer -Wl,-z,max-page-size=0x1000
-STATIC_CFLAGS += -I../include -DVERSION=$(VERSION)
+STATIC_CFLAGS += -fno-stack-protector -fno-omit-frame-pointer
+STATIC_CFLAGS += -I../include -DVERSION=$(VERSION) -Wl,-z,max-page-size=0x1000
 
 # -fstack-shuffle
 # TODO: have the stack protection link properly
