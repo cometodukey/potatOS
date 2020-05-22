@@ -452,7 +452,7 @@ fmt_putptr(t_writer *writer, t_token *token, va_list vlist) {
     size_t              idx;
 
     intern_pop_wildcards(token, vlist);
-    n = (unsigned long long)va_arg(vlist, void *);
+    n = (uintptr_t)va_arg(vlist, void *);
     number.value = n;
     number.base = 16U;
     idx = intern_ntoa(buf, number, token->flags & FLAGS_CAPITAL);
