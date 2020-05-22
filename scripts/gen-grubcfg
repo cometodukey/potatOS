@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+
+[ "$#" -eq 0 ] && exit 1
+
+template="set timeout = 0
+set default = 0
+
+font=\"/boot/grub/fonts/unicode.pf2\"
+
+menuentry \"potatOS\" {
+    multiboot /boot/%s
+    module /boot/initramfs initramfs
+    module /boot/kernel.syms kernel.syms
+    boot
+}"
+
+printf "$template" "$1" > fsroot/boot/grub/grub.cfg

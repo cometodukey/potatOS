@@ -1,0 +1,7 @@
+Language: C
+IndentWidth: 4
+UseTabs: Never
+PointerAlignment: Right
+AlignOperands: 'true'
+SpaceBeforeParens: ControlStatements
+ColumnLimit: 80

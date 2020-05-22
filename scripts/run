@@ -1,0 +1,26 @@
+#!/usr/bin/env sh
+
+usage() {
+    printf "usage: $0 [debug] [usage]\n" 2>&1
+    exit 1
+}
+
+main() {
+    GDB="toolchain/i686-tools/bin/i686-elf-gdb"
+    QEMU="qemu-system-x86_64"
+
+    [ "$#" -eq 0 ] && {
+        $QEMU -m 512M -no-reboot -no-shutdown -hda potatOS.iso
+        return
+    }
+
+    case "$1" in
+    "debug")
+        $QEMU -m 256M -S -gdb tcp::1337 -no-reboot -no-shutdown -hda potatOS.iso &
+        $GDB kernel/spud.img;;
+    "usage")
+        usage;;
+    esac
+}
+
+main "$@"

@@ -1,0 +1,21 @@
+#!/bin/sh
+
+set -e
+
+[ "$#" -ne 2 ] && exit 1
+
+TMP1=$(mktemp)
+TMP2=$(mktemp)
+TMP3=$(mktemp)
+
+if [ -z "$OBJDUMP" ]; then
+    OBJDUMP=objdump
+fi
+
+${OBJDUMP} -t "$1" | sed '/\bd\b/d' | sort > "$TMP1"
+grep "\.text" < "$TMP1" | cut -d' ' -f1 > "$TMP2"
+grep "\.text" < "$TMP1" | awk 'NF{ print $NF }' > "$TMP3"
+
+paste -d'$' "$TMP2" "$TMP3" | sed 's/\$/ /g' > "$2"
+
+rm "$TMP1" "$TMP2" "$TMP3"

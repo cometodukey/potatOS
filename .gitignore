@@ -1,0 +1,6 @@
+*.o
+spud-*.img
+potatOS.iso
+toolchain/
+.vscode/
+kernel/README.md

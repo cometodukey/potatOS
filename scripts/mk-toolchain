@@ -1,0 +1,107 @@
+#!/usr/bin/env sh
+
+GDB_VERSION="9.1"
+GCC_VERSION="9.3.0"
+BINUTILS_VERSION="2.34"
+
+GDB="gdb-$GDB_VERSION"
+GCC="gcc-$GCC_VERSION"
+BINUTILS="binutils-$BINUTILS_VERSION"
+
+GDB_URL="https://ftp.gnu.org/gnu/gdb/$GDB.tar.xz"
+GCC_URL="ftp://ftp.mirrorservice.org/sites/sourceware.org/pub/gcc/releases/gcc-$GCC_VERSION/$GCC.tar.xz"
+BINUTILS_URL="https://mirrors.tripadvisor.com/gnu/binutils/$BINUTILS.tar.xz"
+
+PREFIX="toolchain/i686-tools"
+TARGET="i686-elf"
+
+get_sources() {
+    wget "$GDB_URL" -O "$GDB.tar.xz"
+    wget "$GCC_URL" -O "$GCC.tar.xz"
+    wget "$BINUTILS_URL" -O "$BINUTILS.tar.xz"
+}
+
+inflate_tarballs() {
+    tar xvf "$GDB.tar.xz"
+    tar xvf "$GCC.tar.xz"
+    tar xvf "$BINUTILS.tar.xz"
+}
+
+build_and_install_binutils() {
+    dir="$BINUTILS"
+    mkdir -p "$dir/build"
+    cd "$dir/build"
+
+    ../configure                \
+            --prefix "$PWD/$PREFIX"  \
+            --disable-nls       \
+            --with-sysroot      \
+            --disable-werror    \
+            --target="$TARGET"
+
+    make
+    make install
+
+    cd -
+}
+
+build_and_install_gcc() {
+    dir="$GCC"
+    mkdir -p "$dir/build"
+    cd "$dir/build"
+
+    ../configure                    \
+            --prefix "$PWD/$PREFIX"      \
+            --without-headers       \
+            --enable-languages=c    \
+            --disable-multilib      \
+            --disable-bootstrap     \
+            --with-system-zlib      \
+            --disable-nls           \
+            --target="$TARGET"
+
+    make all-gcc
+    make all-target-libgcc
+    make install-gcc
+    make install-target-libgcc
+
+    cd -
+}
+
+build_and_install_gdb() {
+    dir="$GDB"
+    mkdir -p "$dir/build"
+    cd "$dir/build"
+
+    ../configure                \
+            --prefix "$PWD/$PREFIX"  \
+            --target "$TARGET"
+
+    make
+    make install
+
+    cd -
+}
+
+libgcc() {
+    # TODO: strip symbols from libgcc
+    cp -f i686-tools/lib/gcc/i686-elf/9.3.0/libgcc.a i686-tools/lib
+}
+
+main() {
+    # exit if any commands fail
+    set -e
+
+    mkdir -p "../$PREFIX"
+    cd ../toolchain
+
+    get_sources
+    inflate_tarballs
+
+    build_and_install_binutils
+    build_and_install_gcc
+    build_and_install_gdb
+    libgcc
+}
+
+main
