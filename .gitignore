@@ -1,6 +1,8 @@
 *.o
 spud-*.img
 potatOS.iso
+spud-*.elf
+kernel.syms
 toolchain/
 .vscode/
 kernel/README.md
