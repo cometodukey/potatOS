@@ -12,6 +12,8 @@
 #include <kernel/mm/pmm.h>
 #include <kernel/lib/symbols.h>
 
+#include <kernel/lib/printf/printf.h>
+
 MultibootModule *initramfs = NULL;
 MultibootModule *kernel_syms = NULL;
 
@@ -24,6 +26,8 @@ kernel_main(uint32_t magic, const MultibootInfo *mb) {
     kputs("spud-"xstringify(VERSION)" started");
     kputs("MIT License. Copyright (c) 2020 Edward Bruce\r\n");
     // TODO: log the boot time
+
+
 
     init_gdt();
     init_idt();
