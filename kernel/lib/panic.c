@@ -25,7 +25,7 @@ panic(const char *file, size_t line,
     do_stack_traceback();
 
     va_start(args, msg);
-    kvprintf(msg, args);
+    vkprintf((char*)msg, args);
     kprint_flush();
     va_end(args);
 

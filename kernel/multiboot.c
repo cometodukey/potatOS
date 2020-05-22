@@ -17,7 +17,7 @@ parse_multiboot_info(uint32_t magic, const MultibootInfo *mb) {
                 MULTIBOOT_BOOTLOADER_MAGIC, magic);
     }
 
-    kprint("Multiboot info:\r\n");
+    kprintf("Multiboot info:\r\n");
     kprintf(" Header flags:        %p\r\n", mb->flags);
     if (mb->flags & MULTIBOOT_INFO_BOOT_LOADER_NAME) {
         kprintf(" Bootloader name:     %s\r\n", mb->boot_loader_name);

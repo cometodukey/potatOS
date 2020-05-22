@@ -5,6 +5,8 @@
 #include <kernel/lib/mem.h>
 #include <kernel/arch/idle.h>
 
+#include <kernel/lib/printf/printf.h>
+
 static int parse_id(char id_out[8], char **stream);
 static int hexdigit(char c);
 static size_t xstr_to_ul(const char *num);

@@ -4,5 +4,6 @@
 int isxdigit(int c);
 int isdigit(int c);
 int isprint(int c);
+int tolower(int c);
 
 #endif /* __CTYPE_H__ */
