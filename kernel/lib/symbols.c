@@ -4,61 +4,35 @@
 #include <kernel/lib/string.h>
 #include <kernel/lib/mem.h>
 #include <kernel/arch/idle.h>
+#include <kernel/lib/assert.h>
 
 #include <kernel/lib/printf/printf.h>
 
-static int parse_id(char id_out[8], char **stream);
 static int hexdigit(char c);
-static size_t xstr_to_ul(const char *num);
+static void debug_stream(char **stream);
+/* static size_t xstr_to_ul(const char *num); */
 static char consume(char **stream);
+static char expect_consume(char expectation, char **stream);
+static int parse_id(char **stream);
+static int parse_sym_name(char sym_out_buf[64], char **stream);
 
 size_t *symlist = NULL;
 size_t symlist_len = 0;
 
 void
 init_symlist(MultibootModule *kernelsyms) {
-    size_t i, num;
-    char *base = (char *)kernelsyms->mod_start, *name;
+    UNUSED(debug_stream);
+    size_t num;
+    char *base = (char *)kernelsyms->mod_start;
     char **syms = &base;
-    char c;
-    char xdigit[9];
+    char sym_name[64];
 
-    size_t counter = 0;
-
-    for (i = kernelsyms->mod_end - kernelsyms->mod_start; i; --i) {
-        memset(xdigit, 0, LEN(xdigit));
-        if (i - 8) {
-            /* parse the address */
-            if (parse_id(xdigit, syms) == -1) {
-                kputs("kernel.symlist is invalid! expected a base 16 number");
-                return;
-            }
-            num = xstr_to_ul(xdigit);
-            /* get the start of the symbol name */
-            name = base;
-            if ((c = consume(syms)) == ' ') {
-                for (; i; --i, ++counter) {
-                    kprintf("here %u\r\n", counter);
-                    c = consume(syms);
-                    if (c == '\n') {
-                        memcpy(base, &num, sizeof(num));
-                        base[sizeof(num)] = ' ';
-                        memmove(base+sizeof(num)+1, name, base-name);
-                        base[base-name] = '\0';
-                        continue;
-                    } else if (!isprint(c)) {
-                        kputs("kernel.symlist is invalid! expected a printable character or LF");
-                        kprintf("%x %c\r\n", c, c);
-                        return;
-                    }
-                }
-                kputs("kernel.symlist is invalid! expected a new line");
-                return;
-            } else {
-                kputs("kernel.symlist is invalid! expected a space");
-                return;
-            }
-        }
+    for (;hexdigit(*syms[0]) >= 0;) {
+        num = parse_id(syms);
+        expect_consume(' ', syms);
+        parse_sym_name(sym_name, syms);
+        expect_consume('\n', syms);
+        kprintf("%d => %.64s\r\n", num, sym_name);
     }
 
     symlist = (size_t *)kernelsyms->mod_start;
@@ -66,40 +40,40 @@ init_symlist(MultibootModule *kernelsyms) {
 }
 
 static int
-parse_id(char id_out[8], char **stream) {
-    size_t i;
-    char digit;
-    for (i = 0; i < 8; ++i) {
-        digit = consume(stream);
-        if (isxdigit(digit)) {
-            id_out[i] = digit;
-        } else {
-            return -1;
-        }
-    }
+parse_id(char **stream) {
+    size_t accum = 0;
+    char curr_digit;
+    do {
+        curr_digit = consume(stream);
+        accum = accum * 16 + hexdigit(curr_digit);
+    } while (hexdigit((*stream)[0]) >= 0);
+    return accum;
+}
+
+static int
+parse_sym_name(char sym_out_buf[64], char **stream) {
+    size_t write_head = 0;
+    char curr_char;
+    memset(sym_out_buf, '\0', 64);
+
+    do {
+        curr_char = consume(stream);
+        sym_out_buf[write_head++] = curr_char;
+    } while (isprint((*stream)[0]) && (*stream)[0] != '\n');
     return 0;
 }
 
 static int
 hexdigit(char c) {
     if (c >= 'a' && c <= 'f') {
-        return (c - 'a') + 10;
+        return c - 'a' + 10;
     } else if (c >= 'A' && c <= 'F') {
-        return (c - 'A') + 10;
+        return c - 'A' + 10;
     } else if (isdigit(c)) {
-        return (c - '0');
+        return c - '0';
     } else {
         return -1;
     }
-}
-
-static size_t
-xstr_to_ul(const char *str) {
-    size_t num = 0;
-    for (; *str != '\0'; ++str) {
-        num = num * 16 + hexdigit(*str);
-    }
-    return num;
 }
 
 static char
@@ -107,4 +81,17 @@ consume(char **stream) {
     char curr = **stream;
     (*stream)++;
     return curr;
+}
+
+static char
+expect_consume(char expectation, char **stream) {
+    const char consumed = consume(stream);
+    assert(consumed == expectation);
+    return consumed;
+}
+
+
+static void
+debug_stream(char **stream) {
+    kprintf("STREAM_HEAD %m\r\n", *stream, 16);
 }

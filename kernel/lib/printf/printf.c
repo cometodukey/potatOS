@@ -18,9 +18,10 @@ vwprintf(t_writer *writer, char *fmt, va_list vlist) {
   for (;;)
   {
     res = parse_token(&token, &fmt);
+    
     if (res < 0)
       return res;
-    run_token(writer, vlist, &token);
+    run_token(writer, &vlist, &token);
     if (writer->failed)
       return -1;
     if (*fmt == '\0')
@@ -252,9 +253,9 @@ intern_fmt_printmemory(t_writer *writer, unsigned char *bytes, size_t len, t_fla
 }
 
 void
-fmt_printmemory(t_writer *writer, t_token *token, va_list vlist) {
-    void *addr = va_arg(vlist, void*);
-    size_t len = va_arg(vlist, size_t);
+fmt_printmemory(t_writer *writer, t_token *token, va_list *vlist) {
+    void *addr = va_arg(*vlist, void*);
+    size_t len = va_arg(*vlist, size_t);
 
     intern_fmt_printmemory(writer, (unsigned char *)addr, len, token->flags);
 }
@@ -320,7 +321,7 @@ fmt_do_puthex(t_writer *writer, t_token *token, t_number number) {
 }
 
 void
-fmt_puthex(t_writer *writer, t_token *token, va_list vlist) {
+fmt_puthex(t_writer *writer, t_token *token, va_list *vlist) {
     unsigned long long n;
     t_number number;
 
@@ -334,16 +335,16 @@ fmt_puthex(t_writer *writer, t_token *token, va_list vlist) {
         fmt_do_puthex(writer, token, number);
 }
 
-unsigned long long
-intern_abs(long long source) {
+unsigned long
+intern_abs(long source) {
     if (source >= 0)
-        return ((unsigned long long)source);
+        return ((unsigned long)source);
     else
-        return (-((unsigned long long)source));
+        return (-((unsigned long)source));
 }
 
 void
-intern_read_number(t_number *number, t_size size, unsigned char base, va_list vlist) {
+intern_read_number(t_number *number, t_size size, unsigned char base, va_list *vlist) {
     long long value = intern_read_signed_int(size, vlist);
 
     number->sign = value >= 0 ? 1 : -1;
@@ -365,7 +366,7 @@ calculate_actual_size(const t_token *tok, size_t number_width, const t_number *n
 }
 
 void
-fmt_putnbr(t_writer *writer, t_token *tok, va_list vlist) {
+fmt_putnbr(t_writer *writer, t_token *tok, va_list *vlist) {
     char buf[128];
     t_number n;
     size_t idx;
@@ -414,7 +415,7 @@ do_fmt_putoct(t_writer *writer, t_token *token, t_number number)
 }
 
 void
-fmt_putoct(t_writer *writer, t_token *token, va_list vlist) {
+fmt_putoct(t_writer *writer, t_token *token, va_list *vlist) {
     t_number num;
 
     intern_pop_wildcards(token, vlist);
@@ -434,7 +435,7 @@ fmt_putoct(t_writer *writer, t_token *token, va_list vlist) {
 }
 
 void
-fmt_putpercent(t_writer *writer, t_token *token, va_list vlist) {
+fmt_putpercent(t_writer *writer, t_token *token, va_list *vlist) {
     UNUSED(vlist);
     if ((token->flags & FLAGS_LEFTALIGN) == 0)
         intern_fmt_pad(writer, ' ', MAX(0, token->width - 1));
@@ -444,7 +445,7 @@ fmt_putpercent(t_writer *writer, t_token *token, va_list vlist) {
 }
 
 void
-fmt_putptr(t_writer *writer, t_token *token, va_list vlist) {
+fmt_putptr(t_writer *writer, t_token *token, va_list *vlist) {
     unsigned long long  actual_size;
     unsigned long long  n;
     t_number            number;
@@ -452,7 +453,7 @@ fmt_putptr(t_writer *writer, t_token *token, va_list vlist) {
     size_t              idx;
 
     intern_pop_wildcards(token, vlist);
-    n = (uintptr_t)va_arg(vlist, void *);
+    n = (uintptr_t)va_arg(*vlist, void *);
     number.value = n;
     number.base = 16U;
     idx = intern_ntoa(buf, number, token->flags & FLAGS_CAPITAL);
@@ -470,14 +471,14 @@ fmt_putptr(t_writer *writer, t_token *token, va_list vlist) {
 }
 
 void
-fmt_putstr(t_writer *writer, t_token *token, va_list vlist) {
+fmt_putstr(t_writer *writer, t_token *token, va_list *vlist) {
     char    *str;
     size_t  len;
     size_t  trimmed_length;
     char    check;
 
     intern_pop_wildcards(token, vlist);
-    str = va_arg(vlist, char *);
+    str = va_arg(*vlist, char *);
     if (str == NULL)
     {
         check = (!(token->flags & FLAGS_PRECISION) || token->precision >= 6);
@@ -499,17 +500,17 @@ fmt_putstr(t_writer *writer, t_token *token, va_list vlist) {
 }
 
 void
-fmt_putstrlit(t_writer *writer, t_token *token, va_list vlist) {
+fmt_putstrlit(t_writer *writer, t_token *token, va_list *vlist) {
     (void)vlist;
     writer_write(writer, token->s_value, token->s_length);
 }
 
 void
-fmt_putchr(t_writer *writer, t_token *token, va_list vlist) {
+fmt_putchr(t_writer *writer, t_token *token, va_list *vlist) {
     char        c;
 
     intern_pop_wildcards(token, vlist);
-    c = (char)va_arg(vlist, int);
+    c = (char)va_arg(*vlist, int);
     if ((token->flags & FLAGS_LEFTALIGN) == 0)
         intern_fmt_pad(writer, ' ', MAX(0, token->width - 1));
     writer_write(writer, &c, 1);
@@ -518,7 +519,7 @@ fmt_putchr(t_writer *writer, t_token *token, va_list vlist) {
 }
 
 t_number
-va_arg_unsigned_number(t_size size, va_list vlist) {
+va_arg_unsigned_number(t_size size, va_list *vlist) {
     t_number            number;
     unsigned long long  input;
 
@@ -530,7 +531,7 @@ va_arg_unsigned_number(t_size size, va_list vlist) {
 }
 
 void
-fmt_putuns(t_writer *writer, t_token *tok, va_list vlist) {
+fmt_putuns(t_writer *writer, t_token *tok, va_list *vlist) {
     char        buf[128];
     t_number    n;
     size_t      idx;
@@ -563,29 +564,29 @@ fmt_putuns(t_writer *writer, t_token *tok, va_list vlist) {
 ** do a cast dance.
 */
 
-unsigned long long
-intern_read_unsigned_int(t_size size, va_list v) {
+unsigned long
+intern_read_unsigned_int(t_size size, va_list *v) {
     if (size == E_HH)
-        return ((unsigned long long)(unsigned char)va_arg(v, unsigned int));
+        return ((unsigned long )(unsigned char)va_arg(*v, unsigned int));
     else if (size == E_H)
-        return ((unsigned long long)(unsigned short)va_arg(v, unsigned int));
+        return ((unsigned long )(unsigned short)va_arg(*v, unsigned int));
     else if (size == E_N)
-        return ((unsigned long long)va_arg(v, unsigned int));
+        return ((unsigned long )va_arg(*v, unsigned int));
     else if (size == E_L)
-        return ((unsigned long long)va_arg(v, unsigned long));
+        return ((unsigned long )va_arg(*v, unsigned long));
     else
-        return (va_arg(v, unsigned long long));
+        return (va_arg(*v, unsigned long));
 }
 
-long long
-intern_read_signed_int(t_size size, va_list vlist) {
+long
+intern_read_signed_int(t_size size, va_list *vlist) {
   switch (size)
     {
-    case E_HH: return ((long long)(char)va_arg(vlist, int));
-    case E_H:  return ((long long)(short)va_arg(vlist, int));
-    case E_N:  return ((long long)va_arg(vlist, int));
-    case E_L:  return ((long long)va_arg(vlist, long));
-    default:   return (va_arg(vlist, long long));
+    case E_HH: return (long)(char)va_arg(*vlist, int);
+    case E_H:  return (long)(short)va_arg(*vlist, int);
+    case E_N:  return (long)va_arg(*vlist, int);
+    case E_L:  return (long)va_arg(*vlist, long);
+    default:   return va_arg(*vlist, long);
     }
 }
 
@@ -598,10 +599,10 @@ intern_read_signed_int(t_size size, va_list vlist) {
 /* } */
 
 void
-intern_pop_wildcards(t_token *token, va_list vlist) {
+intern_pop_wildcards(t_token *token, va_list *vlist) {
     if (token->width == DEFERRED_WILDCARD)
     {
-        token->width = va_arg(vlist, int);
+        token->width = va_arg(*vlist, int);
         if (token->width < 0)
         {
             token->width = -token->width;
@@ -609,7 +610,7 @@ intern_pop_wildcards(t_token *token, va_list vlist) {
         }
     }
     if (token->flags & FLAGS_PRECISION && token->precision == DEFERRED_WILDCARD)
-        token->precision = va_arg(vlist, int);
+        token->precision = va_arg(*vlist, int);
 }
 
 char
@@ -650,7 +651,7 @@ intern_to_hex(char num, int caps) {
 }
 
 void
-run_token(t_writer *writer, va_list vlist, t_token *token) {
+run_token(t_writer *writer, va_list *vlist, t_token *token) {
     const t_formatter fmts[] = {
         fmt_putstrlit,
         fmt_putpercent,
