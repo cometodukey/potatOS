@@ -6,6 +6,7 @@
 #include <kernel/lib/assert.h>
 #include <kernel/console/console.h>
 #include <kernel/lib/kprint.h>
+#include <kernel/serial/serial.h>
 
 #define MAX(x, y) ((x) > (y) ? (x) : (y))
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
@@ -40,17 +41,38 @@ vkprintf(char *fmt, va_list vlist) {
 }
 
 ssize_t
+vserialprintf(char *fmt, va_list vlist) {
+  t_writer writer;
+
+  memset(&writer, 0, sizeof(t_writer));
+  writer.write = &writer_serial_write;
+  return vwprintf(&writer, fmt, vlist);
+}
+
+ssize_t
+serial_printf(char *fmt, ...) {
+  va_list vlist;
+  ssize_t ret;
+
+  va_start(vlist, fmt);
+  ret = vserialprintf(fmt, vlist);
+  va_end(vlist);
+
+  return ret;
+}
+
+ssize_t
 kprintf(char *fmt, ...) {
   va_list vlist;
   ssize_t ret;
 
   va_start(vlist, fmt);
   ret = vkprintf(fmt, vlist);
+  if (KPRINTF_PRINT_BOTH) (void)vserialprintf(fmt, vlist);
   va_end(vlist);
-  
+
   return ret;
 }
-
 
 ssize_t vsnprintf(char *dest, ssize_t capacity, char *fmt, va_list vlist)
 {
@@ -108,6 +130,29 @@ writer_console_write(t_writer *self, char *str, size_t length) {
     kprintf_console_buffer[kprintf_console_buffer_size++] = str[i];
     if (str[i] == '\n' || kprintf_console_buffer_size >= KPRINTF_CONSOLE_BUFFER_SIZE)
       writer_console_flush();
+  }
+}
+
+/*---- WRITING TO SERIAL ----*/
+
+#define KPRINTF_SERIAL_BUFFER_SIZE 128
+
+static size_t kprintf_serial_buffer_size = 0;
+static char kprintf_serial_buffer[KPRINTF_SERIAL_BUFFER_SIZE] = {0};
+
+void writer_serial_flush(void) {
+  serial_write_string(SERIAL_COM1_BASE, kprintf_serial_buffer, kprintf_serial_buffer_size);
+  memset(kprintf_serial_buffer, 0, sizeof(kprintf_serial_buffer));
+  kprintf_serial_buffer_size = 0;
+}
+
+void
+writer_serial_write(t_writer *self, char *str, size_t length) {
+  UNUSED(self);
+  for(size_t i = 0; i < length; i++) {
+    kprintf_serial_buffer[kprintf_serial_buffer_size++] = str[i];
+    if (str[i] == '\n' || kprintf_serial_buffer_size >= KPRINTF_SERIAL_BUFFER_SIZE)
+      writer_serial_flush();
   }
 }
 

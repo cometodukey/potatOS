@@ -14,6 +14,8 @@
 
 #include <kernel/lib/printf/printf.h>
 
+#include <kernel/serial/serial.h>
+
 MultibootModule *initramfs = NULL;
 MultibootModule *kernel_syms = NULL;
 
@@ -22,6 +24,7 @@ kernel_main(uint32_t magic, const MultibootInfo *mb) {
     //TODO: boot_timestamp = get_timestamp();
     init_random();
     init_console();
+    serial_init(SERIAL_COM1_BASE);
 
     kputs("spud-"xstringify(VERSION)" started");
     kputs("MIT License. Copyright (c) 2020 Edward Bruce\r\n");
