@@ -70,6 +70,11 @@ void writer_console_write(t_writer *self, char *str, size_t length);
 
 
 /*
+** Write to serial
+*/
+typedef void t_writer_serial_state;
+void writer_serial_write(t_writer *self, char *str, size_t length);
+/*
 ** Write to string
 */
 typedef struct s_writer_string_state {

@@ -10,7 +10,11 @@ main() {
     QEMU="qemu-system-x86_64"
 
     [ "$#" -eq 0 ] && {
-        $QEMU -m 512M -no-reboot -no-shutdown -hda potatOS.iso
+        $QEMU -m 512M \
+		-no-reboot \
+		-serial stdio \
+		-no-shutdown \
+		-hda potatOS.iso
         return
     }
 
