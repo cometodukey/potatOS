@@ -84,7 +84,7 @@ void writer_string_write(t_writer *self, char *str, size_t length);
 
 typedef struct s_number {
     char sign;
-    unsigned int value; // FIXME: should really be unsigned long long
+    unsigned long value; // FIXME: should really be unsigned long long
     unsigned char base;
 } t_number;
 
@@ -112,9 +112,9 @@ void intern_fmt_pad_right(t_writer *writer, t_token *token, char c, int length);
 int intern_hex_size(long long n);
 size_t intern_ntoa(char *buf_out, t_number number, int caps);
 char intern_pad_char(t_flags flags);
-unsigned long long intern_abs(long long source);
-unsigned long long intern_read_unsigned_int(t_size size, va_list vlist);
-long long intern_read_signed_int(t_size size, va_list vlist);
+unsigned long intern_abs(long source);
+unsigned long intern_read_unsigned_int(t_size size, va_list vlist);
+long intern_read_signed_int(t_size size, va_list vlist);
 /* long double intern_read_float(t_size size, va_list vlist); */
 
 char *intern_sign_for(t_number *number);
