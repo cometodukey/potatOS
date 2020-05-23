@@ -32,7 +32,7 @@ init_symlist(MultibootModule *kernelsyms) {
         expect_consume(' ', syms);
         parse_sym_name(sym_name, syms);
         expect_consume('\n', syms);
-        kprintf("%d => %s\r\n", num, sym_name); // doesn't work due to some weird va_args stuff
+        kprintf("%d => %.64s\r\n", num, sym_name);
     }
 
     symlist = (size_t *)kernelsyms->mod_start;
@@ -66,24 +66,15 @@ parse_sym_name(char sym_out_buf[64], char **stream) {
 static int
 hexdigit(char c) {
     if (c >= 'a' && c <= 'f') {
-        return (c - 'a') + 10;
+        return c - 'a' + 10;
     } else if (c >= 'A' && c <= 'F') {
-        return (c - 'A') + 10;
+        return c - 'A' + 10;
     } else if (isdigit(c)) {
-        return (c - '0');
+        return c - '0';
     } else {
         return -1;
     }
 }
-
-/* static size_t */
-/* xstr_to_ul(const char *str) { */
-/*     size_t num = 0; */
-/*     for (; *str != '\0'; ++str) { */
-/*         num = num * 16 + hexdigit(*str); */
-/*     } */
-/*     return num; */
-/* } */
 
 static char
 consume(char **stream) {
@@ -102,5 +93,5 @@ expect_consume(char expectation, char **stream) {
 
 static void
 debug_stream(char **stream) {
-    kprintf("WHEAD %m\r\n", *stream, 16);
+    kprintf("STREAM_HEAD %m\r\n", *stream, 16);
 }
