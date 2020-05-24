@@ -39,10 +39,9 @@ kernel_main(uint32_t magic, const MultibootInfo *mb) {
     if (kernel_syms == NULL) {
         kputs("No kernel symbol table was loaded");
     }
+    PANIC("test", 0);
 
     init_pmm(mb->mmap_addr, mb->mmap_length);
-
-    PANIC("test", 0);
 
     //0/0;
 

@@ -6,12 +6,13 @@
 #include <kernel/arch/idle.h>
 #include <kernel/lib/assert.h>
 #include <kernel/lib/symbols.h>
+#include <kernel/lib/errno.h>
 
 static ssize_t hexdigit(char c);
 static char consume(char **stream);
 static char expect_consume(char expectation, char **stream);
 static size_t parse_id(char **stream);
-static int parse_sym_name(char sym_out_buf[SYM_NAME_SIZ], char **stream);
+static KernelResult parse_sym_name(char sym_out_buf[SYM_NAME_SIZ], char **stream);
 
 size_t
 parse_symlist(MultibootModule *kernelsyms, char sym_name[SYM_NAME_SIZ], size_t addr) {
@@ -27,7 +28,7 @@ parse_symlist(MultibootModule *kernelsyms, char sym_name[SYM_NAME_SIZ], size_t a
             return prev;
         }
         expect_consume(' ', syms);
-        if (parse_sym_name(sym_name_buf, syms) == -1) {
+        if (parse_sym_name(sym_name_buf, syms) == GENERIC_ERR) {
             memcpy(sym_name_buf, "?", 2);
             break;
         }
@@ -49,7 +50,7 @@ parse_id(char **stream) {
     return accum;
 }
 
-static int
+static KernelResult
 parse_sym_name(char sym_out_buf[SYM_NAME_SIZ], char **stream) {
     size_t write_head = 0;
     char curr_char;
@@ -58,7 +59,7 @@ parse_sym_name(char sym_out_buf[SYM_NAME_SIZ], char **stream) {
     for (; write_head < SYM_NAME_SIZ;) {
         if ((*stream)[0] != '\n') {
             if (!isprint((*stream)[0])) {
-                return -1;
+                return GENERIC_ERR;
             }
             curr_char = consume(stream);
             sym_out_buf[write_head++] = curr_char;
@@ -79,7 +80,7 @@ hexdigit(char c) {
     } else if (isdigit(c)) {
         return c - '0';
     } else {
-        return -1;
+        return GENERIC_ERR;
     }
 }
 

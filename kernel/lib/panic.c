@@ -24,12 +24,9 @@ panic(const char *file, size_t line, const char *func,
         print_registers(regs);
     }
     do_stack_traceback();
-
     va_start(args, msg);
     vkprintf((char*)msg, args);
-    kprint_flush();
     va_end(args);
-
     hang();
 }
 
