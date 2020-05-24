@@ -11,7 +11,7 @@ serial_configure_baud_rate(SerialPort com, unsigned short divisor) {
        divisor & 0x00FF);
 }
 
-void
+static void
 serial_configure_line(SerialPort com)
 {
     /* Bit:     | 7 | 6 | 5 4 3 | 2 | 1 0 |
