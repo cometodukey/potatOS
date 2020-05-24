@@ -40,9 +40,9 @@ kernel_main(uint32_t magic, const MultibootInfo *mb) {
         kputs("No kernel symbol table was loaded");
     }
 
-    PANIC("test\r\n", 0);
+    init_pmm(mb->mmap_addr, mb->mmap_length);
 
-    //init_pmm(mb->mmap_addr, mb->mmap_length);
+    PANIC("test", 0);
 
     //0/0;
 

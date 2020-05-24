@@ -27,7 +27,10 @@ parse_symlist(MultibootModule *kernelsyms, char sym_name[SYM_NAME_SIZ], size_t a
             return prev;
         }
         expect_consume(' ', syms);
-        parse_sym_name(sym_name_buf, syms);
+        if (parse_sym_name(sym_name_buf, syms) == -1) {
+            memcpy(sym_name_buf, "?", 2);
+            break;
+        }
         expect_consume('\n', syms);
         prev = num;
     }
@@ -52,11 +55,18 @@ parse_sym_name(char sym_out_buf[SYM_NAME_SIZ], char **stream) {
     char curr_char;
     memset(sym_out_buf, '\0', 64);
 
-    do {
-        curr_char = consume(stream);
-        sym_out_buf[write_head++] = curr_char;
-    } while (write_head < SYM_NAME_SIZ &&
-                isprint((*stream)[0]) && (*stream)[0] != '\n');
+    for (; write_head < SYM_NAME_SIZ;) {
+        if ((*stream)[0] != '\n') {
+            if (!isprint((*stream)[0])) {
+                return -1;
+            }
+            curr_char = consume(stream);
+            sym_out_buf[write_head++] = curr_char;
+        } else {
+            break;
+        }
+    }
+
     return 0;
 }
 

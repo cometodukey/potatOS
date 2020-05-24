@@ -12,7 +12,7 @@ static void print_registers(const Registers *regs);
 static void do_stack_traceback(void);
 static char *trace_address(size_t *off, size_t addr);
 
-static char name[SYM_NAME_SIZ] = "?";
+static char name[SYM_NAME_SIZ];
 
 noreturn void
 panic(const char *file, size_t line, const char *func,
@@ -33,13 +33,12 @@ panic(const char *file, size_t line, const char *func,
     hang();
 }
 
-// TODO: implement kprintf padding and use it here because register dumps are hard to read
 static void
 print_registers(const Registers *regs) {
-    kprintf("EAX = %x EBX    = %x ECX = %x EDX = %x\r\n", regs->eax, regs->ebx, regs->ecx, regs->edx);
-    kprintf("ESI = %x EDI    = %x ESP = %x EBP = %x\r\n", regs->esi, regs->edi, regs->esp, regs->ebp);
-    kprintf("EIP = %x EFLAGS = %x\r\n", regs->eip, regs->eflags);
-    kprintf("CS  = %x DS     = %x SS  = %x\r\n", regs->cs,  regs->ds, regs->ss);
+    kprintf("EAX = %08x EBX    = %08x ECX = %08x EDX = %08x\r\n", regs->eax, regs->ebx, regs->ecx, regs->edx);
+    kprintf("ESI = %08x EDI    = %08x ESP = %08x EBP = %08x\r\n", regs->esi, regs->edi, regs->esp, regs->ebp);
+    kprintf("EIP = %08x EFLAGS = %08x\r\n", regs->eip, regs->eflags);
+    kprintf("CS  = %08x DS     = %08x SS  = %08x\r\n", regs->cs,  regs->ds, regs->ss);
 }
 
 static void
@@ -57,6 +56,10 @@ do_stack_traceback(void) {
 static char *
 trace_address(size_t *off, size_t addr) {
     extern MultibootModule *kernel_syms;
+    if (kernel_syms == NULL) {
+        *off = 0;
+        return "?";
+    }
     size_t base = parse_symlist(kernel_syms, name, addr);
     *off = addr - base;
     return name;

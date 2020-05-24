@@ -47,9 +47,7 @@ parse_multiboot_info(uint32_t magic, const MultibootInfo *mb) {
         kprintf(" Framebuffer width:   %u\r\n", mb->framebuffer_width);
         kprintf(" Framebuffer height:  %u\r\n", mb->framebuffer_height);
         kprintf(" Framebuffer BPP:     %u\r\n", mb->framebuffer_bpp);
-        kprintf(" Framebuffer type:    %u%s\r\n",
-                mb->framebuffer_type,
-                mb->framebuffer_type == 2 ? " (EGA text mode)" : "");
+        kprintf(" Framebuffer type:    %u\r\n", mb->framebuffer_type);
     }
     kprint_flush();
 }

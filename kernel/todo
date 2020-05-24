@@ -1,5 +1,4 @@
-fix the symbol list parser
-read the parsed symbol list in stack trace
+fix the error case in parse_sym_name
 fix the double faults
 fix the register dump values in panic
 
