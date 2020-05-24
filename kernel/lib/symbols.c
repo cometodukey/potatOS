@@ -5,38 +5,36 @@
 #include <kernel/lib/mem.h>
 #include <kernel/arch/idle.h>
 #include <kernel/lib/assert.h>
+#include <kernel/lib/symbols.h>
 
-#define SYM_NAME_SIZ 64
-
-static int hexdigit(char c);
+static ssize_t hexdigit(char c);
 static char consume(char **stream);
 static char expect_consume(char expectation, char **stream);
-static int parse_id(char **stream);
+static size_t parse_id(char **stream);
 static int parse_sym_name(char sym_out_buf[64], char **stream);
 
-size_t *symlist = NULL;
-size_t symlist_len = 0;
-
-void
-init_symlist(MultibootModule *kernelsyms) {
-    size_t num;
+size_t
+parse_symlist(MultibootModule *kernelsyms, char sym_name[SYM_NAME_SIZ], size_t addr) {
+    size_t num, prev = 0;
     char *base = (char *)kernelsyms->mod_start;
     char **syms = &base;
-    char sym_name[SYM_NAME_SIZ];
 
-    for (;hexdigit(*syms[0]) >= 0;) {
+    for (; hexdigit(*syms[0]) >= 0;) {
         num = parse_id(syms);
         expect_consume(' ', syms);
         parse_sym_name(sym_name, syms);
         expect_consume('\n', syms);
-        kprintf("%d => %.64s\r\n", num, sym_name);
+        kprintf("addr %x | num %x | prev %x\r\n", addr, num, prev);
+        if (num > addr) {
+            return prev;
+        }
+        prev = num;
     }
-
-    symlist = (size_t *)kernelsyms->mod_start;
-    symlist_len = kernelsyms->mod_end - kernelsyms->mod_start;
+    memcpy(sym_name, "?", 2);
+    return addr;
 }
 
-static int
+static size_t
 parse_id(char **stream) {
     size_t accum = 0;
     char curr_digit;
@@ -61,7 +59,7 @@ parse_sym_name(char sym_out_buf[SYM_NAME_SIZ], char **stream) {
     return 0;
 }
 
-static int
+static ssize_t
 hexdigit(char c) {
     if (c >= 'a' && c <= 'f') {
         return c - 'a' + 10;

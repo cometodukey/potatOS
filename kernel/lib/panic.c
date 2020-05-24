@@ -6,19 +6,20 @@
 #include <kernel/varargs.h>
 #include <kernel/arch/exception.h>
 #include <kernel/lib/mem.h>
+#include <kernel/lib/symbols.h>
 
 static void print_registers(const Registers *regs);
 static void do_stack_traceback(void);
 static char *trace_address(size_t *off, size_t addr);
 
+static char name[SYM_NAME_SIZ] = "?";
+
 noreturn void
-panic(const char *file, size_t line,
-      const char *func, const Registers *regs, const char *msg, ...)
+panic(const char *file, size_t line, const char *func,
+      const Registers *regs, const char *msg, ...)
 {
     va_list args;
-    kprintf("Kernel panic in %s:%u:%s\r\n",
-            file, line, func);
-
+    kprintf("Kernel panic in %s:%u:%s\r\n", file, line, func);
     if (regs != NULL) {
         print_registers(regs);
     }
@@ -45,7 +46,7 @@ static void
 do_stack_traceback(void) {
     StackFrame *stack;
     size_t offset = 0;
-    __asm__ volatile("movl %%ebp, %0" : "=r"(stack));
+    __asm__ volatile("movl %%ebp, %0" : "=r" (stack));
     kputs("Stack trace:");
     for (; stack != NULL; stack = stack->ebp) {
         kprintf(" [%p] %s+%x\r\n",
@@ -55,23 +56,8 @@ do_stack_traceback(void) {
 
 static char *
 trace_address(size_t *off, size_t addr) {
-    extern size_t *symlist;
-    extern size_t symlist_len;
-    size_t i, func_addr;
-    char *name;
-
-    if (symlist != NULL) {
-        for (i = 0; i < symlist_len ; i++) {
-            func_addr = *symlist;
-            if (func_addr >= addr) {
-                *off = addr - func_addr;
-                name = (char *)(symlist + sizeof(size_t) + 1);
-                return name;
-            }
-            for (; *symlist != '\0'; ++i, ++symlist);
-        }
-    }
-
-    *off = 0;
-    return "?";
+    extern MultibootModule *kernel_syms;
+    size_t base = parse_symlist(kernel_syms, name, addr);
+    *off = addr - base;
+    return name;
 }

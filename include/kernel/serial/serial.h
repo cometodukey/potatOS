@@ -14,9 +14,9 @@
 #define SERIAL_LINE_ENABLE_DLAB         0x80
 
 
-typedef unsigned int t_serial_port;
+typedef unsigned int SerialPort;
 
-void serial_init(t_serial_port com);
-void serial_write_character(t_serial_port com, char a);
-void serial_write_string(t_serial_port com, char *str, size_t length);
+void init_serial(SerialPort com);
+void serial_write_character(SerialPort com, char a);
+void serial_write_string(SerialPort com, char *str, size_t length);
 #endif // __SERIAL_H__

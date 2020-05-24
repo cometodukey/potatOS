@@ -11,11 +11,9 @@
 #include <kernel/lib/random.h>
 #include <kernel/mm/pmm.h>
 #include <kernel/lib/symbols.h>
-
-#include <kernel/lib/printf/printf.h>
-
 #include <kernel/serial/serial.h>
 
+const char *version = xstringify(VERSION);
 MultibootModule *initramfs = NULL;
 MultibootModule *kernel_syms = NULL;
 
@@ -24,13 +22,11 @@ kernel_main(uint32_t magic, const MultibootInfo *mb) {
     //TODO: boot_timestamp = get_timestamp();
     init_random();
     init_console();
-    serial_init(SERIAL_COM1_BASE);
+    init_serial(SERIAL_COM1_BASE);
 
-    kputs("spud-"xstringify(VERSION)" started");
+    kprintf("spud-%s started\r\n", version);
     kputs("MIT License. Copyright (c) 2020 Edward Bruce\r\n");
     // TODO: log the boot time
-
-
 
     init_gdt();
     init_idt();
@@ -42,11 +38,9 @@ kernel_main(uint32_t magic, const MultibootInfo *mb) {
     /* a panic before this point will not have a useful traceback */
     if (kernel_syms == NULL) {
         kputs("No kernel symbol table was loaded");
-    } else {
-        init_symlist(kernel_syms);
     }
 
-    // PANIC("test", 0);
+    PANIC("test\r\n", 0);
 
     //init_pmm(mb->mmap_addr, mb->mmap_length);
 

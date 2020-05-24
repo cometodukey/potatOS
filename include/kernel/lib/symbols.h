@@ -3,6 +3,8 @@
 
 #include <kernel/multiboot.h>
 
-void init_symlist(MultibootModule *syms);
+#define SYM_NAME_SIZ 64
+
+size_t parse_symlist(MultibootModule *syms, char sym_name[SYM_NAME_SIZ], size_t addr);
 
 #endif /* __SYMBOLS_H__ */

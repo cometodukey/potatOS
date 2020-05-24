@@ -27,7 +27,6 @@ Run `make kernel` to build the kernel and `make` or `make iso` to generate an IS
 To run the ISO image in QEMU, run `scripts/run`.  
 
 Utilities required for building from source are:
-
 * make
 * cat
 * tr
@@ -39,3 +38,4 @@ Utilities required for building from source are:
 * mkdir
 * wget
 * tar
+* nasm
