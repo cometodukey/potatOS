@@ -23,7 +23,7 @@ parse_symlist(MultibootModule *kernelsyms, char sym_name[SYM_NAME_SIZ], size_t a
 
     for (; hexdigit(*syms[0]) >= 0;) {
         num = parse_id(syms);
-        if (num > addr) {
+        if (num >= addr) {
             memcpy(sym_name, sym_name_buf, SYM_NAME_SIZ);
             return prev;
         }
