@@ -30,13 +30,13 @@ parse_multiboot_info(uint32_t magic, const MultibootInfo *mb) {
         kprintf(" Modules address:     %p\r\n", mb->mods_addr);
         iterate_mods_list((MultibootModule *)mb->mods_addr, mb->mods_count);
     } else {
-        PANIC("No modules were loaded - no initramfs!", 0);
+        PANIC("No modules were loaded - no initramfs!");
     }
     if (mb->flags & MULTIBOOT_INFO_MEM_MAP) {
         kprintf(" Memory map length:   %p\r\n", mb->mmap_length);
         kprintf(" Memory map address:  %p\r\n", mb->mmap_addr);
     } else {
-        PANIC("No memory map was passed by the bootloader!", 0);
+        PANIC("No memory map was passed by the bootloader!");
     }
     if (mb->flags & MULTIBOOT_INFO_FRAMEBUFFER_INFO) {
         // TODO: kprint colour info
@@ -49,7 +49,7 @@ parse_multiboot_info(uint32_t magic, const MultibootInfo *mb) {
         kprintf(" Framebuffer BPP:     %u\r\n", mb->framebuffer_bpp);
         kprintf(" Framebuffer type:    %u\r\n", mb->framebuffer_type);
     }
-    kprint_flush();
+    kputs(""); //kprint_flush(); TODO
 }
 
 static void

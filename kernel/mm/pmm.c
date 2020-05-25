@@ -108,7 +108,7 @@ pmm_alloc(void) {
             goto free_page;
         }
     }
-    PANIC("Out of physical memory!", 0);
+    PANIC("Out of physical memory!");
 free_page:
     set_bitmap(i);
     return ((void *)(uintptr_t)(PAGE_SIZE * i));
@@ -127,7 +127,7 @@ pmm_free(void *page) {
     assert((uintptr_t)page >= MEM_BASE);
     /* check if the page is mapped */
     if (!test_bitmap(bit)) {
-        PANIC("Attempt to unmap an unmapped page!", 0);
+        PANIC("Attempt to unmap an unmapped page!");
     }
     unset_bitmap(bit);
     last_unset = page;

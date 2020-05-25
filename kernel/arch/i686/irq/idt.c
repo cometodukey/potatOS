@@ -48,11 +48,11 @@ init_idt(void) {
     /* 31 is reserved */
 
     /* load the table */
-    /* lidt((uint32_t)&idt_ptr); */
+    lidt((uint32_t)&idt_ptr);
 
     /* enable interrupts */
-    /* enable_nmi(); */
-    /* sti(); */
+    enable_nmi();
+    sti();
 
     kprintf("Loaded IDT at %p\r\n\r\n", &idt_ptr);
 }

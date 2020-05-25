@@ -45,5 +45,5 @@ exception_handler(const Registers *regs) {
     //     regs->int_no = 15;
     // }
     kprintf("Received exception %s (%d) with error code %d\r\n", names[regs->int_no], regs->int_no, regs->error);
-    panic(__FILE__, __LINE__, __func__, regs, "interrupt backtrace");
+    panic(__FILE__, __LINE__, __func__, regs, "interrupt debugging");
 }

@@ -5,8 +5,8 @@
 #include <kernel/multiboot.h>
 #include <kernel/arch/exception.h>
 
-#define PANIC(msg, ...) \
-    panic(__FILE__, __LINE__, __func__, NULL, msg, __VA_ARGS__)
+#define PANIC(...) \
+    panic(__FILE__, __LINE__, __func__, NULL, __VA_ARGS__)
 
 typedef  struct __attribute__((packed)) StackFrame {
     struct StackFrame *ebp;

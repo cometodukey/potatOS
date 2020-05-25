@@ -33,13 +33,12 @@ kernel_main(uint32_t magic, const MultibootInfo *mb) {
 
     parse_multiboot_info(magic, mb);
     if (initramfs == NULL) {
-        PANIC("No initramfs was loaded!\r\n", 0);
+        PANIC("No initramfs was loaded!\r\n");
     }
     /* a panic before this point will not have a useful traceback */
     if (kernel_syms == NULL) {
         kputs("No kernel symbol table was loaded");
     }
-    PANIC("test", 0);
 
     init_pmm(mb->mmap_addr, mb->mmap_length);
 

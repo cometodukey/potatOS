@@ -27,6 +27,7 @@ panic(const char *file, size_t line, const char *func,
     va_start(args, msg);
     vkprintf((char*)msg, args);
     va_end(args);
+    kputs(""); // TODO: write an actual kprint_flush function
     hang();
 }
 
@@ -35,7 +36,7 @@ print_registers(const Registers *regs) {
     kprintf("EAX = %08x EBX    = %08x ECX = %08x EDX = %08x\r\n", regs->eax, regs->ebx, regs->ecx, regs->edx);
     kprintf("ESI = %08x EDI    = %08x ESP = %08x EBP = %08x\r\n", regs->esi, regs->edi, regs->esp, regs->ebp);
     kprintf("EIP = %08x EFLAGS = %08x\r\n", regs->eip, regs->eflags);
-    kprintf("CS  = %08x DS     = %08x SS  = %08x\r\n", regs->cs,  regs->ds, regs->ss);
+    kprintf("CS  = %8.4x DS     = %8.4x SS  = %8.4x\r\n", regs->cs,  regs->ds, regs->ss);
 }
 
 static void
