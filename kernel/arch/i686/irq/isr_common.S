@@ -54,8 +54,7 @@ isr_common_stub:
     iret
 
 exception_common_stub:
-    ; TODO: push all segment registers and check that they are correct
-    ; TODO: work out whether eip, esp, ebp, ss, cs and err_code are correct
+    ; exception, error code, eip, esp, cs, ss, eflags, es, gs, fs
     ; save registers
     pushad
     cld
@@ -64,7 +63,7 @@ exception_common_stub:
     xor eax, eax
     mov ax, ds
     push eax
-    mov ax, 0x10
+    mov ax, GDT_KERNEL_DS
     mov ds, ax
     mov es, ax
     mov fs, ax

@@ -19,31 +19,28 @@ static const char *names[] = {
     "Stack Fault",
     "GPF",
     "Page Fault",
-    "?",
+    "?", /* 15 */
     "x87 Floating Point",
     "Alignment Check",
     "Machine Check",
     "SIMD Floating Point",
     "Virtualisation",
-    "?",
-    "?",
-    "?",
-    "?",
-    "?",
-    "?",
-    "?",
-    "?",
-    "?",
-    "Security"
+    "?", /* 21 */
+    "?", /* 22 */
+    "?", /* 23 */
+    "?", /* 24 */
+    "?", /* 25 */
+    "?", /* 26 */
+    "?", /* 27 */
+    "?", /* 28 */
+    "?", /* 29 */
+    "Security",
+    "?" /* 30 */
 };
 
 void
 exception_handler(const Registers *regs) {
-    // TODO: write a better handler
-    //assert(regs->int_no < LEN(names));
-    // if (regs->int_no >= LEN(names)) {
-    //     regs->int_no = 15;
-    // }
-    kprintf("Received exception %s (%d) with error code %d\r\n", names[regs->int_no], regs->int_no, regs->error);
+    assert(regs->exception < LEN(names));
+    kprintf("Received exception %s (%d) with error code %d\r\n", names[regs->exception], regs->exception, regs->error);
     panic(__FILE__, __LINE__, __func__, regs, "interrupt debugging");
 }

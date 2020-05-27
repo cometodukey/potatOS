@@ -51,7 +51,7 @@ enum {
 typedef struct {
     size_t ds;
     size_t edi, esi, ebp, unused, ebx, edx, ecx, eax;
-    size_t int_no, error;
+    size_t exception, error;
     size_t eip, cs, eflags, esp, ss;
 } __attribute__((packed)) Registers;
 

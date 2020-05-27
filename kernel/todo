@@ -12,6 +12,5 @@ lockless pmm and other shared memory? use atomic vars?
 initramfs
 allow config macros to be set at compile time
 fix console last row bug
-fix mandatory varargs in PANIC macro
 clang-format
 use an LDT?

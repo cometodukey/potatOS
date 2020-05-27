@@ -46,7 +46,7 @@ do_stack_traceback(void) {
     __asm__ volatile("movl %%ebp, %0" : "=r" (stack));
     kputs("Stack trace:");
     for (; stack != NULL; stack = stack->ebp) {
-        kprintf(" [%p] %s+%x\r\n",
+        kprintf(" [%.8p] %s+%x\r\n",
                 stack->eip, trace_address(&offset, (size_t)stack->eip), offset);
     }
 }
