@@ -10,6 +10,7 @@ global exception_bound_range_handler
 global exception_invalid_opcode_handler
 global exception_no_device_handler
 global exception_double_fault_handler
+global exception_coproc_segment_overrun
 global exception_invalid_tss_handler
 global exception_no_segment_handler
 global exception_ss_fault_handler
