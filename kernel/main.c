@@ -46,8 +46,6 @@ kernel_main(uint32_t magic, const MultibootInfo *mb) {
 
     init_pmm(mb->mmap_addr, mb->mmap_length);
 
-    //0/0;
-
     //pmm_alloc();
     //pmm_alloc();
 

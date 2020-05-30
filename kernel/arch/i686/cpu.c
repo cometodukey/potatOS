@@ -1,5 +1,6 @@
 #include <kernel/types.h>
 
+// TODO: check this is correct for IA-32
 int
 cpuid(uint32_t leaf, uint32_t subleaf, uint32_t *eax,
       uint32_t *ebx, uint32_t *ecx, uint32_t *edx)

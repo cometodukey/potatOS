@@ -3,6 +3,7 @@
 #include <kernel/lib/panic.h>
 #include <kernel/lib/kprint.h>
 #include <kernel/arch/cpu.h>
+#include <kernel/arch/interrupts.h>
 
 static int apic_support(void);
 
@@ -21,6 +22,9 @@ init_apic(void) {
         PANIC("APIC not supported!");
     }
     kputs("Yes");
+
+    enable_nmi();
+    sti();
 }
 
 static int
@@ -28,9 +32,5 @@ apic_support(void) {
     uint32_t eax, ebx, ecx, edx = 0;
 
     cpuid(1, 0, &eax, &ebx, &ecx, &edx);
-    if (edx & CPUID_APIC_BIT) {
-        return 1;
-    } else {
-        return 0;
-    }
+    return edx & CPUID_APIC_BIT;
 }
