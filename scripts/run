@@ -6,7 +6,8 @@ usage() {
 }
 
 main() {
-    GDB="toolchain/i686-tools/bin/i686-elf-gdb"
+    GDB="gdb"
+    #"toolchain/i686-tools/bin/i686-elf-gdb"
     QEMU="qemu-system-x86_64"
 
     [ "$#" -eq 0 ] && {
