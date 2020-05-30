@@ -1,7 +1,3 @@
-fix the double faults
-fix the register dump values in panic
-
-interrupts - exceptions
 GDT for userland
 paging and vmm
 kprintf padding

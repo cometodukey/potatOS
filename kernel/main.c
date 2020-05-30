@@ -12,6 +12,7 @@
 #include <kernel/mm/pmm.h>
 #include <kernel/lib/symbols.h>
 #include <kernel/serial/serial.h>
+#include <kernel/arch/apic.h>
 
 const char *version = xstringify(VERSION);
 MultibootModule *initramfs = NULL;
@@ -28,8 +29,11 @@ kernel_main(uint32_t magic, const MultibootInfo *mb) {
     kputs("MIT License. Copyright (c) 2020 Edward Bruce\r\n");
     // TODO: log the boot time
 
+    kputs("Loading descriptor tables");
     init_gdt();
     init_idt();
+
+    init_apic();
 
     parse_multiboot_info(magic, mb);
     if (initramfs == NULL) {

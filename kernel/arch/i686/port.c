@@ -35,3 +35,8 @@ void
 out32(uint16_t port, uint32_t data) {
     __asm__ volatile("outl %0, %1" :: "a"(data), "d"(port));
 }
+
+void
+io_wait(void) {
+    out8(0x80, 0x00);
+}

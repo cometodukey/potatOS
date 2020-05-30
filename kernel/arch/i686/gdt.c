@@ -26,7 +26,7 @@ init_gdt(void) {
     gdt_entry(GDT_USER_DS, 0, 0, 0, 0);
 
     lgdt((uint32_t)&gdt_ptr);
-    kprintf("Loaded GDT at %p\r\n", &gdt_ptr);
+    kprintf(" Loaded GDT at %p\r\n", &gdt_ptr);
 }
 
 static void

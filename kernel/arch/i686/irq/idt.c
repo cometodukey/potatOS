@@ -3,6 +3,8 @@
 #include <kernel/arch/gdt.h>
 #include <kernel/arch/port.h>
 #include <kernel/lib/kprint.h>
+#include <kernel/arch/apic.h>
+#include <kernel/arch/isr.h>
 
 extern void lidt(uint32_t ptr);
 static void idt_entry(uint8_t num, uint32_t base,
@@ -50,14 +52,28 @@ init_idt(void) {
     idt_entry(30, (uint32_t)exception_security_handler,        8, 0x8e);
     /* 31 is reserved */
 
+    /* legacy PIC vectors */
+    idt_entry(32, (uint32_t)pic_pit,           8, 0x8e);
+    idt_entry(33, (uint32_t)pic_keyboard,      8, 0x8e);
+    idt_entry(34, (uint32_t)pic_cascade,       8, 0x8e);
+    idt_entry(35, (uint32_t)pic_com2,          8, 0x8e);
+    idt_entry(36, (uint32_t)pic_com1,          8, 0x8e);
+    idt_entry(37, (uint32_t)pic_lpt2,          8, 0x8e);
+    idt_entry(38, (uint32_t)pic_floppy_disk,   8, 0x8e);
+    idt_entry(39, (uint32_t)pic_lpt1,          8, 0x8e);
+    idt_entry(40, (uint32_t)pic_rtc,           8, 0x8e);
+    idt_entry(41, (uint32_t)pic_unused0,       8, 0x8e);
+    idt_entry(42, (uint32_t)pic_unused1,       8, 0x8e);
+    idt_entry(43, (uint32_t)pic_unused2,       8, 0x8e);
+    idt_entry(44, (uint32_t)pic_ps2_mouse,     8, 0x8e);
+    idt_entry(45, (uint32_t)pic_coprocessor,   8, 0x8e);
+    idt_entry(46, (uint32_t)pic_primary_ata,   8, 0x8e);
+    idt_entry(47, (uint32_t)pic_secondary_ata, 8, 0x8e);
+
     /* load the table */
     lidt((uint32_t)&idt_ptr);
 
-    /* enable interrupts */
-    enable_nmi();
-    sti();
-
-    kprintf("Loaded IDT at %p\r\n\r\n", &idt_ptr);
+    kprintf(" Loaded IDT at %p\r\n\r\n", &idt_ptr);
 }
 
 void
@@ -81,9 +97,7 @@ disable_nmi(void) {
 }
 
 static void
-idt_entry(uint8_t num, uint32_t base,
-          uint16_t selector, uint8_t type)
-{
+idt_entry(uint8_t num, uint32_t base, uint16_t selector, uint8_t type) {
     idt_entries[num].base_low = base & 0xFFFF;
     idt_entries[num].base_high = (base >> 16) & 0xFFFF;
 

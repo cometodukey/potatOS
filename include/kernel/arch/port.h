@@ -13,4 +13,6 @@ uint8_t in8(uint16_t port);
 uint16_t in16(uint16_t port);
 uint32_t in32(uint16_t port);
 
+void io_wait(void);
+
 #endif /* __PORT_H__ */

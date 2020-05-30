@@ -34,3 +34,8 @@ void
 kputs(const char *s) {
     kprintf("%s\r\n", s);
 }
+
+void
+kprint(const char *s) {
+    kprintf("%s", s);
+}

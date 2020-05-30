@@ -5,4 +5,3 @@ spud-*.elf
 kernel.syms
 toolchain/
 .vscode/
-kernel/README.md

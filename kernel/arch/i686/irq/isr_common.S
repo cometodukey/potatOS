@@ -1,5 +1,6 @@
 global lidt
 global isr_common_stub
+
 global exception_common_stub
 global exception_div0_handler
 global exception_debug_handler
@@ -23,7 +24,26 @@ global exception_simd_fpe_handler
 global exception_virt_handler
 global exception_security_handler
 
+global pic_pit
+global pic_keyboard
+global pic_cascade
+global pic_com2
+global pic_com1
+global pic_lpt2
+global pic_floppy_disk
+global pic_lpt1
+global pic_rtc
+global pic_unused0
+global pic_unused1
+global pic_unused2
+global pic_ps2_mouse
+global pic_coprocessor
+global pic_primary_ata
+global pic_secondary_ata
+
 extern exception_handler
+extern pic_irq
+extern pic_eoi
 
 %define GDT_KERNEL_DS 0x10
 
@@ -42,6 +62,17 @@ extern exception_handler
     jmp exception_common_stub
 %endmacro
 
+%macro LEGACY_PIC_STUB 1
+    cli
+    push eax
+    push %1
+    call pic_irq
+    call pic_eoi
+    pop eax
+    pop eax
+    iret
+%endmacro
+
 section .text
 
 bits 32
@@ -55,7 +86,7 @@ isr_common_stub:
     iret
 
 exception_common_stub:
-    ; exception, error code, eip, esp, cs, ss, eflags, es, gs, fs
+    ; TODO: check that exception, error code, eip, esp, cs, ss, eflags, es, gs, fs are correct
     ; save registers
     pushad
     cld
@@ -89,7 +120,7 @@ exception_common_stub:
     popad
     iret
 
-; TODO: add legacy coprocessor segment overrun handler
+; exception handlers
 exception_div0_handler:
     EXCEPTION_NO_ERR 0
 exception_debug_handler:
@@ -135,3 +166,37 @@ exception_virt_handler:
 exception_security_handler:
     EXCEPTION_HAS_ERR 30
 ; 31 is reserved
+
+; legacy PIC handler stubs
+pic_pit:
+    LEGACY_PIC_STUB 0
+pic_keyboard:
+    LEGACY_PIC_STUB 1
+pic_cascade: ; should never be raised
+    LEGACY_PIC_STUB 2
+pic_com2:
+    LEGACY_PIC_STUB 3
+pic_com1:
+    LEGACY_PIC_STUB 4
+pic_lpt2:
+    LEGACY_PIC_STUB 5
+pic_floppy_disk:
+    LEGACY_PIC_STUB 6
+pic_lpt1:
+    LEGACY_PIC_STUB 7
+pic_rtc:
+    LEGACY_PIC_STUB 8
+pic_unused0:
+    LEGACY_PIC_STUB 9
+pic_unused1:
+    LEGACY_PIC_STUB 10
+pic_unused2:
+    LEGACY_PIC_STUB 11
+pic_ps2_mouse:
+    LEGACY_PIC_STUB 12
+pic_coprocessor:
+    LEGACY_PIC_STUB 13
+pic_primary_ata:
+    LEGACY_PIC_STUB 14
+pic_secondary_ata:
+    LEGACY_PIC_STUB 15
