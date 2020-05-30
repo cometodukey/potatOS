@@ -23,15 +23,18 @@ init_idt(void) {
         idt_entry(i, (uint32_t)isr_common_stub, 0, 0x8e);
     }
 
-    idt_entry(0, (uint32_t)exception_div0_handler,             8, 0x8e);
-    idt_entry(1, (uint32_t)exception_debug_handler,            8, 0x8e);
-    idt_entry(2, (uint32_t)exception_nmi_handler,              8, 0x8e);
-    idt_entry(3, (uint32_t)exception_breakpoint_handler,       8, 0x8e);
-    idt_entry(4, (uint32_t)exception_overflow_handler,         8, 0x8e);
-    idt_entry(5, (uint32_t)exception_bound_range_handler,      8, 0x8e);
-    idt_entry(6, (uint32_t)exception_invalid_opcode_handler,   8, 0x8e);
-    idt_entry(7, (uint32_t)exception_no_device_handler,        8, 0x8e);
-    idt_entry(8, (uint32_t)exception_double_fault_handler,     8, 0x8e);
+    /* CPU exception vectors */
+    idt_entry(0,  (uint32_t)exception_div0_handler,            8, 0x8e);
+    idt_entry(1,  (uint32_t)exception_debug_handler,           8, 0x8e);
+    idt_entry(2,  (uint32_t)exception_nmi_handler,             8, 0x8e);
+    idt_entry(3,  (uint32_t)exception_breakpoint_handler,      8, 0x8e);
+    idt_entry(4,  (uint32_t)exception_overflow_handler,        8, 0x8e);
+    idt_entry(5,  (uint32_t)exception_bound_range_handler,     8, 0x8e);
+    idt_entry(6,  (uint32_t)exception_invalid_opcode_handler,  8, 0x8e);
+    idt_entry(7,  (uint32_t)exception_no_device_handler,       8, 0x8e);
+    idt_entry(8,  (uint32_t)exception_double_fault_handler,    8, 0x8e);
+    /* co-processor segment overrun (vector 9) is unsupported after i486 */
+    idt_entry(9,  (uint32_t)exception_coproc_segment_overrun,  8, 0x8e);
     idt_entry(10, (uint32_t)exception_invalid_tss_handler,     8, 0x8e);
     idt_entry(11, (uint32_t)exception_no_segment_handler,      8, 0x8e);
     idt_entry(12, (uint32_t)exception_ss_fault_handler,        8, 0x8e);

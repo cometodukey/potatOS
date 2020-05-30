@@ -13,6 +13,7 @@ void exception_bound_range_handler(void);
 void exception_invalid_opcode_handler(void);
 void exception_no_device_handler(void);
 void exception_double_fault_handler(void);
+void exception_coproc_segment_overrun(void);
 void exception_invalid_tss_handler(void);
 void exception_no_segment_handler(void);
 void exception_ss_fault_handler(void);
@@ -35,6 +36,7 @@ enum {
     INVALID_OPCODE,
     NO_DEVICE,
     DOUBLE_FAULT,
+    COPROC_SEGMENT_OVERRUN,
     INVALID_TSS,
     NO_SEGMENT,
     STACK_FAULT,

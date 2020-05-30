@@ -14,6 +14,7 @@ static const char *names[] = {
     "Invalid Opcode",
     "No Device",
     "Double Fault",
+    "Co-processor segment overrun",
     "Invalid TSS",
     "No Segment",
     "Stack Fault",

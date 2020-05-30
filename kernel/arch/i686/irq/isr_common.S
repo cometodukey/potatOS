@@ -107,6 +107,8 @@ exception_no_device_handler:
     EXCEPTION_NO_ERR 7
 exception_double_fault_handler:
     EXCEPTION_HAS_ERR 8
+exception_coproc_segment_overrun:
+    EXCEPTION_HAS_ERR 9
 exception_invalid_tss_handler:
     EXCEPTION_HAS_ERR 10
 exception_no_segment_handler:
