@@ -20,8 +20,8 @@ main() {
 
     case "$1" in
     "debug")
-        $QEMU -m 256M -S -gdb tcp::1337 -no-reboot -no-shutdown -hda potatOS.iso &
-        $GDB kernel/spud.img;;
+        $QEMU -m 256M -S -s -no-reboot -no-shutdown -hda potatOS.iso &
+        $GDB -x .gdbinit;;
     "usage")
         usage;;
     esac
