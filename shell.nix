@@ -8,6 +8,7 @@ in pkgs.mkShell {
     nasm
     grub2
     xorriso
+    gdb
 
     # libraries
     gmp

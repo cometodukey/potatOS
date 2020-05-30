@@ -6,6 +6,9 @@ STATIC_CFLAGS += -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -mno-80387 -m32 -marc
 STATIC_CFLAGS += -fno-stack-protector -fno-omit-frame-pointer
 STATIC_CFLAGS += -I../include -DVERSION=$(VERSION) -Wl,-z,max-page-size=0x1000
 
+# TODO: make it optional? be smarter!
+STATIC_CFLAGS += -g
+
 # -fstack-shuffle
 # TODO: have the stack protection link properly
 

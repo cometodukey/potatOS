@@ -16,7 +16,7 @@ static KernelResult parse_sym_name(char sym_out_buf[SYM_NAME_SIZ], char **stream
 
 size_t
 parse_symlist(MultibootModule *kernelsyms, char sym_name[SYM_NAME_SIZ], size_t addr) {
-    size_t num, prev = 0;
+    size_t num = 0, prev = 0;
     char *base = (char *)kernelsyms->mod_start;
     char **syms = &base;
     char sym_name_buf[SYM_NAME_SIZ] = {'\0'};
