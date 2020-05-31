@@ -1,5 +1,5 @@
 #include <kernel/multiboot.h>
-#include <kernel/lib/kprint.h>
+#include <kernel/lib/kprintf.h>
 #include <kernel/lib/ctype.h>
 #include <kernel/lib/string.h>
 #include <kernel/lib/mem.h>

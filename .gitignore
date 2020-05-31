@@ -2,6 +2,6 @@
 spud-*.img
 potatOS.iso
 spud-*.elf
-kernel.syms
+spud-*.map
 toolchain/
 .vscode/

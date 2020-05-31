@@ -2,7 +2,7 @@
 #include <kernel/events/exception.h>
 #include <kernel/arch/gdt.h>
 #include <kernel/arch/port.h>
-#include <kernel/lib/kprint.h>
+#include <kernel/lib/kprintf.h>
 #include <kernel/events/isr.h>
 
 extern void lidt(uint32_t ptr);

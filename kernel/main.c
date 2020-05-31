@@ -3,7 +3,7 @@
 #include <kernel/lib/clock.h>
 #include <kernel/lib/assert.h>
 #include <kernel/console/console.h>
-#include <kernel/lib/kprint.h>
+#include <kernel/lib/kprintf.h>
 #include <kernel/arch/idle.h>
 #include <kernel/arch/gdt.h>
 #include <kernel/events/interrupts.h>

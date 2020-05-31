@@ -1,6 +1,6 @@
 #include <kernel/events/isr.h>
 #include <kernel/lib/assert.h>
-#include <kernel/lib/kprint.h>
+#include <kernel/lib/kprintf.h>
 
 const char *pic_names[] = {
     "PIT",

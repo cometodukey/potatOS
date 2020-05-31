@@ -1,7 +1,7 @@
 #include <kernel/types.h>
 #include <kernel/varargs.h>
 #include <kernel/console/vt100.h>
-#include <kernel/lib/kprint.h>
+#include <kernel/lib/kprintf.h>
 #include <kernel/lib/mem.h>
 #include <kernel/lib/assert.h>
 #include <kernel/lib/string.h>

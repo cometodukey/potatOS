@@ -1,4 +1,4 @@
-#include <kernel/lib/kprint.h>
+#include <kernel/lib/kprintf.h>
 #include <kernel/types.h>
 #include <kernel/arch/idle.h>
 #include <kernel/lib/panic.h>

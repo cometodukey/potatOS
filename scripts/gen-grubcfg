@@ -10,8 +10,8 @@ font=\"/boot/grub/fonts/unicode.pf2\"
 menuentry \"potatOS\" {
     multiboot /boot/%s
     module /boot/initramfs initramfs
-    module /boot/kernel.syms kernel.syms
+    module /boot/spud-%s.map spud-%s.map
     boot
 }"
 
-printf "$template" "$1" > fsroot/boot/grub/grub.cfg
+printf "$template" "$1" "$2" "$2" > fsroot/boot/grub/grub.cfg

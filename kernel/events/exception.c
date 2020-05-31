@@ -1,5 +1,5 @@
 #include <kernel/events/exception.h>
-#include <kernel/lib/kprint.h>
+#include <kernel/lib/kprintf.h>
 #include <kernel/lib/panic.h>
 #include <kernel/lib/assert.h>
 

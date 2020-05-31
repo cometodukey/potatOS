@@ -1,7 +1,7 @@
 #include <kernel/multiboot.h>
 #include <kernel/types.h>
 #include <kernel/lib/assert.h>
-#include <kernel/lib/kprint.h>
+#include <kernel/lib/kprintf.h>
 #include <kernel/lib/string.h>
 #include <kernel/arch/idle.h>
 #include <kernel/lib/panic.h>
@@ -54,7 +54,12 @@ parse_multiboot_info(uint32_t magic, const MultibootInfo *mb) {
 static void
 iterate_mods_list(MultibootModule *mods, uint32_t count) {
     extern MultibootModule *initramfs, *kernel_syms;
+    extern const char *version;
+    char kernel_map[KPRINT_BUF_SIZE] = {0};
     uint32_t i;
+
+    snprintf(kernel_map, LEN(kernel_map), "spud-%s.map", version);
+
     for (i = 0; i < count; ++mods, ++i) {
         kprintf("  Module %u:\r\n", count);
         kprintf("   Command line: %s\r\n", mods->cmdline);
@@ -62,7 +67,7 @@ iterate_mods_list(MultibootModule *mods, uint32_t count) {
                 mods->mod_end - mods->mod_start);
         if (!strcmp((char *)mods->cmdline, "initramfs")) {
             initramfs = mods;
-        } else if (!strcmp((char *)mods->cmdline, "kernel.syms")) {
+        } else if (!strcmp((char *)mods->cmdline, kernel_map)) {
             kernel_syms = mods;
         }
     }

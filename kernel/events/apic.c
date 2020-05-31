@@ -1,7 +1,7 @@
 #include <kernel/types.h>
 #include <kernel/events/pic.h>
 #include <kernel/lib/panic.h>
-#include <kernel/lib/kprint.h>
+#include <kernel/lib/kprintf.h>
 #include <kernel/arch/cpu.h>
 #include <kernel/events/interrupts.h>
 

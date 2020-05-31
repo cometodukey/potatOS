@@ -1,5 +1,5 @@
 #include <kernel/arch/gdt.h>
-#include <kernel/lib/kprint.h>
+#include <kernel/lib/kprintf.h>
 
 // TODO: set userspace gdt
 

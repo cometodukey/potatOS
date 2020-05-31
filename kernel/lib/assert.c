@@ -1,5 +1,5 @@
 #include <kernel/types.h>
-#include <kernel/lib/kprint.h>
+#include <kernel/lib/kprintf.h>
 #include <kernel/arch/idle.h>
 #include <kernel/console/vt100.h>
 

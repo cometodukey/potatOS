@@ -1,6 +1,6 @@
 #include <kernel/events/pic.h>
 #include <kernel/arch/port.h>
-#include <kernel/lib/kprint.h>
+#include <kernel/lib/kprintf.h>
 #include <kernel/types.h>
 
 void

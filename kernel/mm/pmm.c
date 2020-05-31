@@ -2,7 +2,7 @@
 #include <kernel/types.h>
 #include <kernel/multiboot.h>
 #include <kernel/mm/pmm.h>
-#include <kernel/lib/kprint.h>
+#include <kernel/lib/kprintf.h>
 #include <kernel/lib/panic.h>
 #include <kernel/lib/bits.h>
 #include <kernel/lib/assert.h>

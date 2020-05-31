@@ -5,7 +5,7 @@
 #include <kernel/lib/string.h>
 #include <kernel/lib/assert.h>
 #include <kernel/console/console.h>
-#include <kernel/lib/kprint.h>
+#include <kernel/lib/kprintf.h>
 #include <kernel/serial/serial.h>
 
 #define MAX(x, y) ((x) > (y) ? (x) : (y))
