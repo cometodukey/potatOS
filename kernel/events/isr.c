@@ -1,4 +1,4 @@
-#include <kernel/arch/isr.h>
+#include <kernel/events/isr.h>
 #include <kernel/lib/assert.h>
 #include <kernel/lib/kprint.h>
 

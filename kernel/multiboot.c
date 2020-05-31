@@ -49,7 +49,6 @@ parse_multiboot_info(uint32_t magic, const MultibootInfo *mb) {
         kprintf(" Framebuffer BPP:     %u\r\n", mb->framebuffer_bpp);
         kprintf(" Framebuffer type:    %u\r\n", mb->framebuffer_type);
     }
-    kputs(""); //kprint_flush(); TODO
 }
 
 static void

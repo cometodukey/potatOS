@@ -1,4 +1,4 @@
-#include <kernel/arch/pic.h>
+#include <kernel/events/pic.h>
 #include <kernel/arch/port.h>
 #include <kernel/lib/kprint.h>
 #include <kernel/types.h>

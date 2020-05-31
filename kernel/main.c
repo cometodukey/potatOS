@@ -6,13 +6,13 @@
 #include <kernel/lib/kprint.h>
 #include <kernel/arch/idle.h>
 #include <kernel/arch/gdt.h>
-#include <kernel/arch/interrupts.h>
+#include <kernel/events/interrupts.h>
 #include <kernel/lib/panic.h>
 #include <kernel/lib/random.h>
 #include <kernel/mm/pmm.h>
 #include <kernel/lib/symbols.h>
 #include <kernel/serial/serial.h>
-#include <kernel/arch/apic.h>
+#include <kernel/events/apic.h>
 
 const char *version = xstringify(VERSION);
 MultibootModule *initramfs = NULL;
@@ -37,7 +37,7 @@ kernel_main(uint32_t magic, const MultibootInfo *mb) {
 
     parse_multiboot_info(magic, mb);
     if (initramfs == NULL) {
-        PANIC("No initramfs was loaded!\r\n");
+        PANIC("No initramfs was loaded!");
     }
     /* a panic before this point will not have a useful traceback */
     if (kernel_syms == NULL) {
@@ -45,7 +45,6 @@ kernel_main(uint32_t magic, const MultibootInfo *mb) {
     }
 
     init_pmm(mb->mmap_addr, mb->mmap_length);
-
     //pmm_alloc();
     //pmm_alloc();
 

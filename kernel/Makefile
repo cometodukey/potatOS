@@ -11,10 +11,10 @@ ifndef KERNEL_IMG
 $(error KERNEL_IMG is not set)
 endif
 
-CSRCS = $(shell find . -type f -name "*.c")
-ASRCS = $(shell find . -type f -name "*.S")
-OBJS  = $(CSRCS:.c=.o)
-OBJS  += $(ASRCS:.S=.o)
+CSRCS =  $(shell find . -type f -name "*.c")
+ASRCS =  $(shell find . -type f -name "*.S")
+OBJS  =  $(CSRCS:.c=.o) $(ASRCS:.S=.o)
+#OBJS  += $(ASRCS:.S=.o)
 
 spud: $(OBJS)
 	$(LD) $(BUILD_LDFLAGS) -T linker.ld -o $(KERNEL_IMG) $(OBJS)

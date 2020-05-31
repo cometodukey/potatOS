@@ -12,9 +12,9 @@ main() {
 
     [ "$#" -eq 0 ] && {
         $QEMU -m 512M \
-		-no-reboot \
+		-no-reboot    \
 		-serial stdio \
-		-no-shutdown \
+		-no-shutdown  \
 		-hda potatOS.iso
         return
     }

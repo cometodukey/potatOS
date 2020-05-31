@@ -1,10 +1,9 @@
-#include <kernel/arch/interrupts.h>
-#include <kernel/arch/exception.h>
+#include <kernel/events/interrupts.h>
+#include <kernel/events/exception.h>
 #include <kernel/arch/gdt.h>
 #include <kernel/arch/port.h>
 #include <kernel/lib/kprint.h>
-#include <kernel/arch/apic.h>
-#include <kernel/arch/isr.h>
+#include <kernel/events/isr.h>
 
 extern void lidt(uint32_t ptr);
 static void idt_entry(uint8_t num, uint32_t base,
@@ -73,7 +72,7 @@ init_idt(void) {
     /* load the table */
     lidt((uint32_t)&idt_ptr);
 
-    kprintf(" Loaded IDT at %p\r\n\r\n", &idt_ptr);
+    kprintf(" Loaded IDT at %p\r\n", &idt_ptr);
 }
 
 void

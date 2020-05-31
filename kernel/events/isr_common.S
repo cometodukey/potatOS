@@ -64,12 +64,14 @@ extern pic_eoi
 
 %macro LEGACY_PIC_STUB 1
     cli
-    push eax
+    pushad
     push %1
     call pic_irq
+    push %1
     call pic_eoi
     pop eax
     pop eax
+    popad
     iret
 %endmacro
 

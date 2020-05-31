@@ -4,7 +4,7 @@
 #include <kernel/lib/panic.h>
 #include <kernel/multiboot.h>
 #include <kernel/varargs.h>
-#include <kernel/arch/exception.h>
+#include <kernel/events/exception.h>
 #include <kernel/lib/mem.h>
 #include <kernel/lib/symbols.h>
 
