@@ -1,0 +1,2 @@
+# using C, not C++ or Objective C
+*.h linguist-language=C
