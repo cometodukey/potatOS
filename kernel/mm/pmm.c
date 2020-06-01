@@ -19,6 +19,7 @@ static int test_bitmap(size_t bit);
 /* each bit represents 4KB
    4KB * 256 = 1MiB
    therefore, we need 256 entries per MiB */
+   // FIXME: this supports up to 512MiB of RAM - if there is more then this will be overflown
 static uint32_t initial_pmm_bitmap[256*512];
 
 static void *last_unset = NULL;

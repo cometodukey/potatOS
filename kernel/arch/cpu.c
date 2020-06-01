@@ -16,3 +16,18 @@ cpuid(uint32_t leaf, uint32_t subleaf, uint32_t *eax,
                       : "a" (leaf), "c" (subleaf));
     return 1;
 }
+
+/* FIXME: using these is janky - use uint64_t? */
+void
+rdmsr(uint32_t ecx, uint32_t *eax, uint32_t *edx) {
+    __asm__ volatile ("rdmsr"
+                      : "=a" (*eax), "=d" (*edx)
+                      : "c" (ecx));
+}
+
+void
+wrmsr(uint32_t ecx, uint32_t eax, uint32_t edx) {
+    __asm__ volatile ("wrmsr"
+                      :
+                      : "a" (eax), "d" (edx), "c" (ecx));
+}

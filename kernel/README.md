@@ -15,6 +15,7 @@ Spud is an i686 kernel for the potatOS operating system.
 
 ## TODO
 
+* ACPI, AML, MADT
 * Stack protections (NX, stack overflow, buffer overflow)?
 * Rewrite the console code
 * VMM and paging
@@ -23,11 +24,3 @@ Spud is an i686 kernel for the potatOS operating system.
 * KASLR and ASLR
 * initramfs
 * Userspace
-* Kernel module signing? comrpession?
-* Direct device io for drivers?
-* Be able to restart system servers
-
-## Modules
-
-* kernel.symlist - not required but useful for stack traces
-* initramfs - required to boot the system
