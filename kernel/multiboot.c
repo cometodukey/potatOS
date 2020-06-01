@@ -61,7 +61,7 @@ iterate_mods_list(MultibootModule *mods, uint32_t count) {
     snprintf(kernel_map, LEN(kernel_map), "spud-%s.map", version);
 
     for (i = 0; i < count; ++mods, ++i) {
-        kprintf("  Module %u:\r\n", count);
+        kprintf("  Module %u:\r\n", i);
         kprintf("   Command line: %s\r\n", mods->cmdline);
         kprintf("   Size:         %p\r\n",
                 mods->mod_end - mods->mod_start);
