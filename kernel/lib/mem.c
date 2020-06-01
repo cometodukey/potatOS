@@ -43,3 +43,13 @@ memcmp(const void *vl, const void *vr, size_t n) {
 	for (; n && *l == *r; n--, l++, r++);
 	return n ? *l-*r : 0;
 }
+
+size_t
+memsum(void *ptr1, size_t size) {
+    char *ptr2 = ptr1;
+    size_t total = 0;
+    for (; size; --size, ++ptr2) {
+        total += *ptr2;
+    }
+    return total;
+}

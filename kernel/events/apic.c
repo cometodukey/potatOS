@@ -48,12 +48,16 @@ apic_support(void) {
 
 static void
 enable_lapic(void) {
+    /* enable LAPIC */
     lapic_base = get_lapic_base();
     set_lapic_base(lapic_base);
 
-    /* dummy read- apparently avoids a bug in older CPUs */
-    lapic_read_reg(0xf0);
-    lapic_write_reg(0xf0, lapic_read_reg(0xf0) | 0x1ff);
+    /* dummy read - apparently avoids a bug in older CPUs */
+    lapic_read_reg(APIC_SIV);
+
+    /* set the spurious interrupt vector  */
+    lapic_write_reg(APIC_SIV, lapic_read_reg(APIC_SIV) | 0x1ff);
+
     kprintf(" LAPIC base is at %p\r\n", lapic_base);
 }
 

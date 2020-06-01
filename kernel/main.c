@@ -13,6 +13,7 @@
 #include <kernel/lib/symbols.h>
 #include <kernel/serial/serial.h>
 #include <kernel/events/apic.h>
+#include <kernel/acpi/acpi.h>
 
 const char *version = xstringify(VERSION);
 MultibootModule *initramfs = NULL;
@@ -32,6 +33,9 @@ kernel_main(uint32_t magic, const MultibootInfo *mb) {
     kputs("Loading descriptor tables");
     init_gdt();
     init_idt();
+
+    /* this must be done before init_apic because we need the APIC base from the ACPI tables */
+    init_acpi();
 
     init_apic();
 

@@ -8,5 +8,6 @@ void *memcpy(void *dest, const void *src, size_t n);
 void *memrcpy(void *dest, const void *src, size_t n);
 void *memmove(void *dest, const void *src, size_t n);
 int memcmp(const void *vl, const void *vr, size_t n);
+size_t memsum(void *ptr, size_t size);
 
 #endif /* __MEM_H__ */
