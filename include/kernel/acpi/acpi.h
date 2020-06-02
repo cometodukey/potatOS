@@ -6,5 +6,6 @@
 
 void init_acpi(void);
 void init_acpi_fadt(Fadt *fadt);
+void init_acpi_madt(Madt *madt);
 
 #endif /* __ACPI_H__ */

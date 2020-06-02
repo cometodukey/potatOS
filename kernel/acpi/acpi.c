@@ -30,7 +30,7 @@ init_acpi(void) {
 
     checksum = memsum(rsdp, 20);
     if (checksum != 0) {
-        PANIC("ACPI checksum is invalid!");
+        PANIC("RSDP checksum is invalid!");
     }
 
     kprintf("  OEM ID:   %.6s\r\n", rsdp->oem_id);
@@ -59,7 +59,7 @@ init_acpi_tables(void) {
     Sdt *header;
     uint8_t checksum = memsum((void *)&rsdt->root_sdt, rsdt->root_sdt.length);
     if (checksum != 0) {
-        PANIC("Invalid SDT checksum!");
+        PANIC("SRDT checksum is invalid!");
     }
     entries = (rsdt->root_sdt.length - sizeof(Sdt)) / 4;
 
@@ -69,6 +69,9 @@ init_acpi_tables(void) {
         if (!memcmp(header, "FACP", 4)) {
             kprintf(" Found Fixed ACPI Description Table at %p\r\n", header);
             init_acpi_fadt((Fadt *)header);
+        } else if (!memcmp(header, "APIC", 4)) {
+            kprintf(" Found Multiple APIC Description Table at %p\r\n", header);
+            init_acpi_madt((Madt *)header);
         } else {
             kprintf(" Found SDT %.4s at %p\r\n", header, header);
         }

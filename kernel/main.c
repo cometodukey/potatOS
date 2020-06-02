@@ -34,11 +34,6 @@ kernel_main(uint32_t magic, const MultibootInfo *mb) {
     init_gdt();
     init_idt();
 
-    /* this must be done before init_apic because we need the APIC base from the ACPI tables */
-    init_acpi();
-
-    init_apic();
-
     parse_multiboot_info(magic, mb);
     if (initramfs == NULL) {
         PANIC("No initramfs was loaded!");
@@ -49,6 +44,12 @@ kernel_main(uint32_t magic, const MultibootInfo *mb) {
     }
 
     init_pmm(mb->mmap_addr, mb->mmap_length);
+
+    /* this must be done before init_apic because we need the APIC base from the ACPI tables */
+    init_acpi();
+
+    init_apic();
+
     //pmm_alloc();
     //pmm_alloc();
 
