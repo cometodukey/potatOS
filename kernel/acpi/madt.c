@@ -9,9 +9,6 @@ Madt *madt = NULL;
 void
 init_acpi_madt(Madt *ptr) {
     uint8_t *entry;
-    MadtLapic *lapic;
-    MadtIoApic *ioapic;
-    MadtIso *iso;
 
     madt = ptr;
     if ((uint8_t)memsum(madt, madt->header.length) != 0) {
@@ -23,26 +20,13 @@ init_acpi_madt(Madt *ptr) {
     {
         switch (*entry) {
         case MADT_LAPIC:
-            lapic = (MadtLapic *)entry;
             kputs("  Found MADT LAPIC");
-            kprintf("   Processor ID: %x\r\n", lapic->processor_id);
-            kprintf("   APIC ID:      %x\r\n", lapic->processor_id);
-            kprintf("   Flags:        %x\r\n", lapic->flags);
             break;
         case MADT_IOAPIC:
-            ioapic = (MadtIoApic *)entry;
             kprintf("  Found MADT IOAPIC");
-            kprintf("   APIC ID: %x\r\n", ioapic->apic_id);
-            kprintf("   Address: %p\r\n", ioapic->addr);
-            kprintf("   GSIB:    %x\r\n", ioapic->gsib);
             break;
         case MADT_ISO:
-            iso = (MadtIso *)entry;
             kputs("  Found MADT ISO");
-            kprintf("   Bus Source: %x\r\n", iso->bus_source);
-            kprintf("   IRQ Source: %x\r\n", iso->irq_source);
-            kprintf("   GSI:        %x\r\n", iso->gsi);
-            kprintf("   Flags:      %x\r\n", iso->flags);
             break;
         case MADT_NMI:
             kputs("  Found MADT NMI");

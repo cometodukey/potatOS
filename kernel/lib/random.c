@@ -8,8 +8,10 @@ static uint32_t xorshift32(uint32_t state);
 void
 init_random(void) {
 	// TODO: fix the screaming issue here
-    extern uintptr_t __stack_chk_guard;
-    __stack_chk_guard = xorshift32(__stack_chk_guard);
+    //extern uintptr_t __stack_chk_guard;
+    //__stack_chk_guard = xorshift32(__stack_chk_guard);
+    xorshift32(1);
+    return;
 }
 
 static uint32_t

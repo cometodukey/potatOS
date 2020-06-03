@@ -1,6 +1,5 @@
 GDT for userland
 paging and vmm
-kprintf padding
 
 panic, assert, __stack_chk_fail safe functions. could be achieved through atomic rd/wr
 
