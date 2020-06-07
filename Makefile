@@ -11,6 +11,7 @@ KERNEL_ELF     := spud-$(KERNEL_VERSION).elf
 
 # CFLAGS, CC
 CFLAGS  = -std=c11 -Wall -Wextra -Wpedantic -Werror
+CFLAGS += -Wno-unused-command-line-argument
 CFLAGS += -g -O0 -march=i686 -m32 -fPIE
 CFLAGS += -ffreestanding -nostdlib -nostartfiles
 CFLAGS += -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -mno-80387
@@ -34,7 +35,7 @@ LD      := $(TOOLCHAIN)/bin/i686-elf-ld
 LDFLAGS := $(TOOLCHAIN)/lib -l:libgcc.a
 # TODO - add to LDFLAGS -Wl,-z,max-page-size=0x1000
 
-# collect kernel sources
+# Collect kernel sources
 KERNEL_CSRCS := $(shell find kernel/ -type f -name "*.c")
 KERNEL_ASRCS := $(shell find kernel/ -type f -name "*.S")
 KERNEL_OBJS  := $(KERNEL_CSRCS:.c=.o) $(KERNEL_ASRCS:.S=.o)
@@ -45,11 +46,13 @@ default: $(KERNEL_ELF)
 .PHONY: all
 all: kernel iso
 
-.PHONY: kernel
+# Build the kernel
+.PHONY: $(KERNEL_ELF)
 $(KERNEL_ELF): $(KERNEL_OBJS)
 	@echo "LD $@"
 	@$(LD) $(LDFLAGS) -T kernel/linker.ld -o $@ $(KERNEL_OBJS)
 
+# Generate a bootable ISO
 # TODO - clean up this rule
 .PHONY: iso
 iso: kernel
@@ -59,6 +62,7 @@ iso: kernel
 	scripts/gen-grubcfg $(KERNEL_ELF) $(VERSION) $(VERSION)
 	grub-mkrescue -o potatOS.iso fsroot/
 
+# Clean build files
 .PHONY: clean
 clean:
 	@rm -f fsroot/boot/spud-$(VERSION).map 	\

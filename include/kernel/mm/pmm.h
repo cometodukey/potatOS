@@ -7,8 +7,6 @@
 #define MIN_MEM (MEM_BASE * 256)
 #define BYTE_TO_MIB(num) (((num) / 1024) / 1024)
 
-_Static_assert(MEM_BASE, "MEM_BASE is 0");
-
 void init_pmm(uint32_t mmap_start, size_t mmap_len);
 void *pmm_alloc(void);
 void *pmm_zalloc(void);
