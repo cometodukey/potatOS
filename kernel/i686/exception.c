@@ -42,6 +42,6 @@ static const char *names[] = {
 void
 exception_handler(const Registers *regs) {
     assert(regs->exception < LEN(names));
+    // TODO - save CR2 on PF
     kprintf("Received exception %s (%d) with error code %d\r\n", names[regs->exception], regs->exception, regs->error);
-    panic(__FILE__, __LINE__, __func__, regs, "interrupt debugging");
 }

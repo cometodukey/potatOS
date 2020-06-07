@@ -124,6 +124,7 @@ pmm_zalloc(void) {
 
 void
 pmm_free(void *page) {
+    /* FIXME - page align pointers */
     size_t bit = (size_t)page / PAGE_SIZE;
     assert((uintptr_t)page >= MEM_BASE);
     /* check if the page is mapped */

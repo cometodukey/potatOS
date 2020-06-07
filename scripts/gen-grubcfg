@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-[ "$#" -eq 0 ] && exit 1
+[ "$#" -lt 3 ] && exit 1
 
 template="set timeout = 0
 set default = 0
@@ -15,4 +15,4 @@ menuentry \"potatOS\" {
 }
 "
 
-printf "$template" "$1" "$2" "$2" > fsroot/boot/grub/grub.cfg
+printf "$template" "$1" "$2" "$2" > "$3"

@@ -31,3 +31,23 @@ wrmsr(uint32_t ecx, uint32_t eax, uint32_t edx) {
                       :
                       : "a" (eax), "d" (edx), "c" (ecx));
 }
+
+uint32_t
+read_cr2(void) {
+    return 0;
+}
+
+uint32_t
+read_cr0(void) {
+    return 0;
+}
+
+void
+write_cr0(uint32_t val) {
+    UNUSED(val);
+}
+
+void
+write_cr3(uint32_t val) {
+    UNUSED(val);
+}

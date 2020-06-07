@@ -1,6 +1,6 @@
 #include <kernel/console/console.h>
 
-// TODO; write the VT100 parser
+/* TODO - these functions on exist because of the __kprintf_assert_fail function */
 
 static void vt100_parse_seq(const char **ptr);
 
