@@ -8,6 +8,7 @@ TOOLCHAIN := $(shell pwd)/toolchain/i686-tools
 
 KERNEL_VERSION := 0.1.0
 KERNEL_ELF     := spud-$(KERNEL_VERSION).elf
+KERNEL_SYMS    := spud-$(KERNEL_VERSION).map
 
 # CFLAGS, CC
 CFLAGS  = -std=c11 -Wall -Wextra -Wpedantic -Werror
@@ -17,6 +18,7 @@ CFLAGS += -ffreestanding -nostdlib -nostartfiles
 CFLAGS += -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -mno-80387
 CFLAGS += -fstack-protector-all -fno-omit-frame-pointer
 CFLAGS += -fno-builtin -fno-common
+CFLAGS += -Wl,-z,max-page-size=0x1000
 CFLAGS += -Iinclude/
 CFLAGS += -DKERNEL_VERSION='"$(KERNEL_VERSION)"'
 
@@ -32,8 +34,7 @@ ASFLAGS := -f elf32
 
 # LD, LDFLAGS
 LD      := $(TOOLCHAIN)/bin/i686-elf-ld
-LDFLAGS := $(TOOLCHAIN)/lib -l:libgcc.a
-# TODO - add to LDFLAGS -Wl,-z,max-page-size=0x1000
+LDFLAGS := -L$(TOOLCHAIN)/lib -l:libgcc.a
 
 # Collect kernel sources
 KERNEL_CSRCS := $(shell find kernel/ -type f -name "*.c")
@@ -50,24 +51,28 @@ all: kernel iso
 .PHONY: $(KERNEL_ELF)
 $(KERNEL_ELF): $(KERNEL_OBJS)
 	@echo "LD $@"
-	@$(LD) $(LDFLAGS) -T kernel/linker.ld -o $@ $(KERNEL_OBJS)
+	@$(LD) $(LDFLAGS) -T kernel/linker.ld -o kernel/$@ $(KERNEL_OBJS)
+	@echo "GENSYMS $@"
+	@scripts/gen-symlist kernel/$(KERNEL_ELF) kernel/$(KERNEL_SYMS)
 
 # Generate a bootable ISO
 # TODO - clean up this rule
 .PHONY: iso
-iso: kernel
+iso: $(KERNEL_ELF)
 	grub-file --is-x86-multiboot kernel/$(KERNEL_ELF)
-	scripts/gen-symlist kernel/$(KERNEL_ELF) fsroot/boot/spud-$(VERSION).map
-	cp -f kernel/$(KERNEL_ELF) fsroot/boot
+	cp kernel/$(KERNEL_SYMS) fsroot/boot
+	cp kernel/$(KERNEL_ELF)  fsroot/boot
 	scripts/gen-grubcfg $(KERNEL_ELF) $(VERSION) $(VERSION)
 	grub-mkrescue -o potatOS.iso fsroot/
 
 # Clean build files
 .PHONY: clean
 clean:
-	@rm -f fsroot/boot/spud-$(VERSION).map 	\
-		fsroot/boot/$(KERNEL_ELF)			\
-		$(KERNEL_OBJS)						\
+	@rm -f fsroot/boot/$(KERNEL_SYMS) 	\
+		fsroot/boot/$(KERNEL_ELF)		\
+		kernel/$(KERNEL_SYMS)			\
+		kernel/$(KERNEL_ELF)			\
+		$(KERNEL_OBJS)					\
 		potatOS.iso
 
 %.o: %.c

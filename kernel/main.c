@@ -13,7 +13,7 @@
 #include <kernel/lib/symbols.h>
 #include <kernel/serial/serial.h>
 
-const char *version = xstringify(VERSION);
+const char *version = xstringify(KERNEL_VERSION);
 MultibootModule *initramfs = NULL;
 MultibootModule *kernel_syms = NULL;
 

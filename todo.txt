@@ -1,5 +1,5 @@
 add git pre-commit hook to generate a compressed OS image
 clarify magic numbers
-initramfs
 migrate from multiboot 0.6.96 to 1.6?
 build grub2 from source?
+run clang-format on each build

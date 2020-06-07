@@ -12,6 +12,7 @@ menuentry \"potatOS\" {
     module /boot/initramfs initramfs
     module /boot/spud-%s.map spud-%s.map
     boot
-}"
+}
+"
 
 printf "$template" "$1" "$2" "$2" > fsroot/boot/grub/grub.cfg

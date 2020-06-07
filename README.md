@@ -14,7 +14,7 @@ GCC requires several libraries to build:
 * isl
 * zstd
 
-Ensure you have all of these installed, otherwise the script will fail.  
+Ensure you have all of these installed, otherwise the script will fail.
 
 GCC might also fail to build if any of these libraries are in non-standard locations.
 To solve this, append the library paths to the LD_LIBRARY_PATH environment variable when building and running GCC.
@@ -23,8 +23,8 @@ To solve this, append the library paths to the LD_LIBRARY_PATH environment varia
 
 ## Building the kernel
 
-Run `make kernel` to build the kernel and `make` or `make iso` to generate an ISO image.
-To run the ISO image in QEMU, run `scripts/run`.  
+Run `make` to build the kernel and `make iso` to generate an ISO image.
+To run the ISO image in QEMU, run `scripts/run`.
 
 Utilities required for building from source are:
 * make
