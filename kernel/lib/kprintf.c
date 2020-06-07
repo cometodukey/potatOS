@@ -1,5 +1,4 @@
 #include <kernel/types.h>
-#include <kernel/varargs.h>
 #include <kernel/console/vt100.h>
 #include <kernel/lib/kprintf.h>
 #include <kernel/lib/mem.h>

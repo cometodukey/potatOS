@@ -2,8 +2,6 @@
 #define __PRINTF_H__
 
 #include <kernel/types.h>
-#include <kernel/varargs.h>
-
 
 // Printing using kprintf will print to serial port as well when this flag is enabled
 #define KPRINTF_PRINT_BOTH 1

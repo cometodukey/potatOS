@@ -3,7 +3,7 @@
 
 #include <kernel/types.h>
 #include <kernel/multiboot.h>
-#include <kernel/events/exception.h>
+#include <kernel/i686/exception.h>
 
 #define PANIC(...) \
     panic(__FILE__, __LINE__, __func__, NULL, __VA_ARGS__)

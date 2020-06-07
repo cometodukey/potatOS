@@ -1,10 +1,9 @@
 #include <kernel/lib/kprintf.h>
 #include <kernel/types.h>
-#include <kernel/arch/idle.h>
+#include <kernel/i686/idle.h>
 #include <kernel/lib/panic.h>
 #include <kernel/multiboot.h>
-#include <kernel/varargs.h>
-#include <kernel/events/exception.h>
+#include <kernel/i686/exception.h>
 #include <kernel/lib/mem.h>
 #include <kernel/lib/symbols.h>
 

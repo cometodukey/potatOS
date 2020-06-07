@@ -9,6 +9,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdnoreturn.h>
+#include <stdarg.h>
 
 typedef int32_t ssize_t;
 

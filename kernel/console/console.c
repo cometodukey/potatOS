@@ -1,6 +1,6 @@
 #include <kernel/console/console.h>
 #include <kernel/lib/mem.h>
-#include <kernel/arch/port.h>
+#include <kernel/i686/port.h>
 
 static void console_scroll(void);
 static void disable_hw_cursor(void);

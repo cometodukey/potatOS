@@ -3,7 +3,7 @@
 #include <kernel/lib/ctype.h>
 #include <kernel/lib/string.h>
 #include <kernel/lib/mem.h>
-#include <kernel/arch/idle.h>
+#include <kernel/i686/idle.h>
 #include <kernel/lib/assert.h>
 #include <kernel/lib/symbols.h>
 #include <kernel/lib/errno.h>

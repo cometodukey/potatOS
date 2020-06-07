@@ -1,4 +1,4 @@
-#include <kernel/events/isr.h>
+#include <kernel/i686/isr.h>
 #include <kernel/lib/assert.h>
 #include <kernel/lib/kprintf.h>
 
@@ -18,7 +18,7 @@ const char *pic_names[] = {
     "PS2 Mouse",
     "Co-processor",
     "Primary ATA",
-    "Secondary ATA", 
+    "Secondary ATA",
 };
 
 void

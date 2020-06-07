@@ -1,4 +1,4 @@
-#include <kernel/events/exception.h>
+#include <kernel/i686/exception.h>
 #include <kernel/lib/kprintf.h>
 #include <kernel/lib/panic.h>
 #include <kernel/lib/assert.h>

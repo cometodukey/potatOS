@@ -3,7 +3,6 @@
 #include <kernel/lib/assert.h>
 #include <kernel/lib/kprintf.h>
 #include <kernel/lib/string.h>
-#include <kernel/arch/idle.h>
 #include <kernel/lib/panic.h>
 
 static void iterate_mods_list(MultibootModule *mods, uint32_t count);

@@ -13,5 +13,6 @@ __stack_chk_fail_local(void) {
 
 noreturn void
 __stack_chk_fail(void) {
+    // FIXME - panic traceback reads from the corrupted stack
     PANIC("Kernel stack smashing detected");
 }

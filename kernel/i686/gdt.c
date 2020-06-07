@@ -1,4 +1,4 @@
-#include <kernel/arch/gdt.h>
+#include <kernel/i686/gdt.h>
 #include <kernel/lib/kprintf.h>
 
 // TODO: set userspace gdt

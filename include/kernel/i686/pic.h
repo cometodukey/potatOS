@@ -27,7 +27,7 @@ enum {
     PIC_EOI         = 0x20  /* end of interrupt - tells the PIC you have received the interrupt */
 };
 
-void remap_pic(uint8_t pic0_offset, uint8_t pic1_offset);
+void init_pic(uint8_t, uint8_t);
 void pic_eoi(unsigned char irq);
 void pic_disable(void);
 

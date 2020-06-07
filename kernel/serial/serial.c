@@ -1,5 +1,5 @@
 #include <kernel/serial/serial.h>
-#include <kernel/arch/port.h>
+#include <kernel/i686/port.h>
 
 static void
 serial_configure_baud_rate(SerialPort com, unsigned short divisor) {

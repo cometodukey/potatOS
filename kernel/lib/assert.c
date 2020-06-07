@@ -1,6 +1,6 @@
 #include <kernel/types.h>
 #include <kernel/lib/kprintf.h>
-#include <kernel/arch/idle.h>
+#include <kernel/i686/idle.h>
 #include <kernel/console/vt100.h>
 
 noreturn void

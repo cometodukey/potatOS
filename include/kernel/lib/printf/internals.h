@@ -2,7 +2,6 @@
 #define __PRINTF_INTERNALS_H__
 
 #include <kernel/types.h>
-#include <kernel/varargs.h>
 
 typedef struct s_writer {
     void (*write)(struct s_writer *self, char *str, size_t length);

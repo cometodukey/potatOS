@@ -1,7 +1,6 @@
 #ifndef __KPRINT_H__
 #define __KPRINT_H__
 
-#include <kernel/varargs.h>
 #include <kernel/lib/printf/printf.h>
 
 #define KPRINT_BUF_SIZE (512)

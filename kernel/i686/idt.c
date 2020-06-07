@@ -1,9 +1,10 @@
-#include <kernel/events/interrupts.h>
-#include <kernel/events/exception.h>
-#include <kernel/arch/gdt.h>
-#include <kernel/arch/port.h>
+#include <kernel/i686/interrupts.h>
+#include <kernel/i686/exception.h>
+#include <kernel/i686/gdt.h>
+#include <kernel/i686/port.h>
 #include <kernel/lib/kprintf.h>
-#include <kernel/events/isr.h>
+#include <kernel/i686/isr.h>
+#include <kernel/i686/pic.h>
 
 extern void lidt(uint32_t ptr);
 static void idt_entry(uint8_t num, uint32_t base,
@@ -68,6 +69,8 @@ init_idt(void) {
     idt_entry(45, (uint32_t)pic_coprocessor,   8, 0x8e);
     idt_entry(46, (uint32_t)pic_primary_ata,   8, 0x8e);
     idt_entry(47, (uint32_t)pic_secondary_ata, 8, 0x8e);
+
+    init_pic(32, 40);
 
     /* load the table */
     lidt((uint32_t)&idt_ptr);

@@ -4,16 +4,14 @@
 #include <kernel/lib/assert.h>
 #include <kernel/console/console.h>
 #include <kernel/lib/kprintf.h>
-#include <kernel/arch/idle.h>
-#include <kernel/arch/gdt.h>
-#include <kernel/events/interrupts.h>
+#include <kernel/i686/idle.h>
+#include <kernel/i686/gdt.h>
+#include <kernel/i686/interrupts.h>
 #include <kernel/lib/panic.h>
 #include <kernel/lib/random.h>
 #include <kernel/mm/pmm.h>
 #include <kernel/lib/symbols.h>
 #include <kernel/serial/serial.h>
-#include <kernel/events/apic.h>
-#include <kernel/acpi/acpi.h>
 
 const char *version = xstringify(VERSION);
 MultibootModule *initramfs = NULL;
@@ -38,23 +36,11 @@ kernel_main(uint32_t magic, const MultibootInfo *mb) {
     if (initramfs == NULL) {
         PANIC("No initramfs was loaded!");
     }
-    /* a panic before this point will not have a useful traceback */
     if (kernel_syms == NULL) {
         kputs("No kernel symbol table was loaded");
     }
 
     init_pmm(mb->mmap_addr, mb->mmap_length);
-
-    /* this must be done before init_apic because we need the APIC base from the ACPI tables */
-    init_acpi();
-
-    init_apic();
-
-    //pmm_alloc();
-    //pmm_alloc();
-
-    //init_vmm();
-    //parse_cmdline();
 
     hang();
 }

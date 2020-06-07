@@ -5,3 +5,5 @@ spud-*.elf
 spud-*.map
 toolchain/
 .vscode/
+user/
+include/user/

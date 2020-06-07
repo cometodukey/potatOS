@@ -1,10 +1,10 @@
-#include <kernel/events/pic.h>
-#include <kernel/arch/port.h>
+#include <kernel/i686/pic.h>
+#include <kernel/i686/port.h>
 #include <kernel/lib/kprintf.h>
 #include <kernel/types.h>
 
 void
-remap_pic(uint8_t pic0_offset, uint8_t pic1_offset) {
+init_pic(uint8_t pic0_offset, uint8_t pic1_offset) {
     char pic0_mask, pic1_mask;
 
     kprintf(" Remapping PIC IRQs with offsets %u and %u\r\n", pic0_offset, pic1_offset);
