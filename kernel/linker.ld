@@ -19,7 +19,6 @@ SECTIONS {
     .bss ALIGN(4K) : {
         section_bss_start = .;
         KEEP(*(.bss))
-        KEEP(*(COMMON))
         section_bss_end = .;
     }
 }

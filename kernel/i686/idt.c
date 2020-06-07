@@ -75,6 +75,10 @@ init_idt(void) {
     /* load the table */
     lidt((uint32_t)&idt_ptr);
 
+    /* enable interrupts */
+    sti();
+    enable_nmi();
+
     kprintf(" Loaded IDT at %p\r\n", &idt_ptr);
 }
 

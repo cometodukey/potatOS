@@ -24,5 +24,5 @@ const char *pic_names[] = {
 void
 pic_irq(unsigned int irq) {
     assert(irq < LEN(pic_names));
-    kprintf("Received legacy PIC IRQ: %s (%u). Ignoring\r\n", pic_names[irq], irq);
+    kprintf("Received PIC IRQ: %s (%u).\r\n", pic_names[irq], irq);
 }

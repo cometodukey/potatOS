@@ -1,25 +1,75 @@
 .POSIX:
-.PHONY: all info kernel iso clean
 
-SCRIPTS = scripts
+# Clear Make builtins
+MAKEFLAGS += --no-builtin-rules --no-builtin-variables
+.SUFFIXES:
 
-VERSION = $(shell cat version.txt | tr -d '[:space:]')
-KERNEL_IMG = spud-$(VERSION).elf
-export VERSION
-export KERNEL_IMG
+TOOLCHAIN := $(shell pwd)/toolchain/i686-tools
 
+KERNEL_VERSION := 0.1.0
+KERNEL_ELF     := spud-$(KERNEL_VERSION).elf
+
+# CFLAGS, CC
+CFLAGS  = -std=c11 -Wall -Wextra -Wpedantic -Werror
+CFLAGS += -g -O0 -march=i686 -m32 -fPIE
+CFLAGS += -ffreestanding -nostdlib -nostartfiles
+CFLAGS += -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -mno-80387
+CFLAGS += -fstack-protector-all -fno-omit-frame-pointer
+CFLAGS += -fno-builtin -fno-common
+CFLAGS += -Iinclude/
+CFLAGS += -DKERNEL_VERSION='"$(KERNEL_VERSION)"'
+
+ifeq ($(CC), clang)
+CFLAGS += --target=i686-pc-unknown-elf
+else
+CC := $(TOOLCHAIN)/bin/i686-elf-gcc
+endif # $(CC), clang
+
+# AS, ASFLAGS
+AS      := nasm
+ASFLAGS := -f elf32
+
+# LD, LDFLAGS
+LD      := $(TOOLCHAIN)/bin/i686-elf-ld
+LDFLAGS := $(TOOLCHAIN)/lib -l:libgcc.a
+# TODO - add to LDFLAGS -Wl,-z,max-page-size=0x1000
+
+# collect kernel sources
+KERNEL_CSRCS := $(shell find kernel/ -type f -name "*.c")
+KERNEL_ASRCS := $(shell find kernel/ -type f -name "*.S")
+KERNEL_OBJS  := $(KERNEL_CSRCS:.c=.o) $(KERNEL_ASRCS:.S=.o)
+
+.PHONY: default
+default: $(KERNEL_ELF)
+
+.PHONY: all
 all: kernel iso
 
-kernel:
-	$(MAKE) $(MAKEFLAGS) -C kernel/
-	grub-file --is-x86-multiboot kernel/$(KERNEL_IMG)
-	$(SCRIPTS)/gen-symlist kernel/$(KERNEL_IMG) fsroot/boot/spud-$(VERSION).map
-	cp -f kernel/$(KERNEL_IMG) fsroot/boot
+.PHONY: kernel
+$(KERNEL_ELF): $(KERNEL_OBJS)
+	@echo "LD $@"
+	@$(LD) $(LDFLAGS) -T kernel/linker.ld -o $@ $(KERNEL_OBJS)
 
+# TODO - clean up this rule
+.PHONY: iso
 iso: kernel
-	$(SCRIPTS)/gen-grubcfg $(KERNEL_IMG) $(VERSION) $(VERSION)
+	grub-file --is-x86-multiboot kernel/$(KERNEL_ELF)
+	scripts/gen-symlist kernel/$(KERNEL_ELF) fsroot/boot/spud-$(VERSION).map
+	cp -f kernel/$(KERNEL_ELF) fsroot/boot
+	scripts/gen-grubcfg $(KERNEL_ELF) $(VERSION) $(VERSION)
 	grub-mkrescue -o potatOS.iso fsroot/
 
+.PHONY: clean
 clean:
-	+$(MAKE) -C kernel/ clean
-	-rm fsroot/boot/spud-$(VERSION).map potatOS.iso fsroot/boot/$(KERNEL_IMG)
+	@rm -f fsroot/boot/spud-$(VERSION).map 	\
+		fsroot/boot/$(KERNEL_ELF)			\
+		$(KERNEL_OBJS)						\
+		potatOS.iso
+
+%.o: %.c
+	@echo "CC $@"
+	@$(CC) $(CFLAGS) -c -o $@ $<
+
+%.o: %.S
+	@echo "AS $@"
+	@$(AS) $(ASFLAGS) -o $@ $<

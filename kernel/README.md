@@ -9,18 +9,16 @@ Spud is an i686 kernel for the potatOS operating system.
 * Stack trace (with symbols!)
 * Serial
 * 8259 PIC
-* APIC
 * VGA text mode console
 * Physical memory allocator
 
 ## TODO
 
-* ACPI, AML, MADT
-* Stack protections (NX, stack overflow, buffer overflow)?
-* Rewrite the console code
-* VMM and paging
-* Facilitate IPC
+* Paging
+* SMP
+* IPC
 * Scheduling
 * KASLR and ASLR
 * initramfs
 * Userspace
+* Kernel build config
