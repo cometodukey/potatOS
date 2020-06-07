@@ -25,8 +25,12 @@ CFLAGS += -DKERNEL_VERSION="$(KERNEL_VERSION)"
 
 ifeq ($(CC), clang)
 CFLAGS += --target=i686-pc-unknown-elf -x c
+LDFLAGS = -L$(TOOLCHAIN)/lib
+else ifeq ($(CC), gcc)
+LDFLAGS = -L$(TOOLCHAIN)/lib
 else
 CC = $(TOOLCHAIN)/bin/i686-elf-gcc
+LDFLAGS = -L$(TOOLCHAIN)/lib -l:libgcc.a
 endif # $(CC), clang
 
 # AS, ASFLAGS
@@ -35,7 +39,6 @@ ASFLAGS = -f elf32
 
 # LD, LDFLAGS
 LD      = $(TOOLCHAIN)/bin/i686-elf-ld
-LDFLAGS = -L$(TOOLCHAIN)/lib -l:libgcc.a
 
 # Enumerate kernel sources
 KERNEL_CSRCS = $(shell find kernel/ -type f -name "*.c")
@@ -43,7 +46,7 @@ KERNEL_ASRCS = $(shell find kernel/ -type f -name "*.S")
 KERNEL_OBJS  = $(KERNEL_CSRCS:.c=.o) $(KERNEL_ASRCS:.S=.o)
 
 .PHONY: default
-default: $(KERNEL_ELF)
+default: $(KERNEL_ELF) info
 
 .PHONY: info
 info:
@@ -56,10 +59,9 @@ info:
 	@echo "Kernel sources = $(KERNEL_CSRCS) $(KERNEL_ASRCS)"
 
 .PHONY: all
-all: $(KERNEL_ELF) iso
+all: $(KERNEL_ELF) iso info
 
 # Build the kernel
-.PHONY: $(KERNEL_ELF)
 $(KERNEL_ELF): $(KERNEL_OBJS)
 	@echo "LD $@"
 	@$(LD) $(LDFLAGS) -T kernel/linker.ld -o kernel/$@ $(KERNEL_OBJS)
