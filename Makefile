@@ -1,14 +1,15 @@
+# TODO - apparently GNU Make allows all GNU extensions even when the .POSIX target is specified
+#        find POSIX alternatives to the shell function
+# Portability stuff
 .POSIX:
-
-# Clear Make builtins
-MAKEFLAGS += --no-builtin-rules --no-builtin-variables
 .SUFFIXES:
+MAKEFLAGS += --no-builtin-rules --no-builtin-variables
 
-TOOLCHAIN := $(shell pwd)/toolchain/i686-tools
+TOOLCHAIN = toolchain/i686-tools
 
-KERNEL_VERSION := 0.1.0
-KERNEL_ELF     := spud-$(KERNEL_VERSION).elf
-KERNEL_SYMS    := spud-$(KERNEL_VERSION).map
+KERNEL_VERSION = 0.1.0
+KERNEL_ELF     = spud-$(KERNEL_VERSION).elf
+KERNEL_SYMS    = spud-$(KERNEL_VERSION).map
 
 # CFLAGS, CC
 CFLAGS  = -std=c11 -Wall -Wextra -Wpedantic -Werror
@@ -25,24 +26,34 @@ CFLAGS += -DKERNEL_VERSION="$(KERNEL_VERSION)"
 ifeq ($(CC), clang)
 CFLAGS += --target=i686-pc-unknown-elf -x c
 else
-CC := $(TOOLCHAIN)/bin/i686-elf-gcc
+CC = $(TOOLCHAIN)/bin/i686-elf-gcc
 endif # $(CC), clang
 
 # AS, ASFLAGS
-AS      := nasm
-ASFLAGS := -f elf32
+AS      = nasm
+ASFLAGS = -f elf32
 
 # LD, LDFLAGS
-LD      := $(TOOLCHAIN)/bin/i686-elf-ld
-LDFLAGS := -L$(TOOLCHAIN)/lib -l:libgcc.a
+LD      = $(TOOLCHAIN)/bin/i686-elf-ld
+LDFLAGS = -L$(TOOLCHAIN)/lib -l:libgcc.a
 
 # Enumerate kernel sources
-KERNEL_CSRCS := $(shell find kernel/ -type f -name "*.c")
-KERNEL_ASRCS := $(shell find kernel/ -type f -name "*.S")
-KERNEL_OBJS  := $(KERNEL_CSRCS:.c=.o) $(KERNEL_ASRCS:.S=.o)
+KERNEL_CSRCS = $(shell find kernel/ -type f -name "*.c")
+KERNEL_ASRCS = $(shell find kernel/ -type f -name "*.S")
+KERNEL_OBJS  = $(KERNEL_CSRCS:.c=.o) $(KERNEL_ASRCS:.S=.o)
 
 .PHONY: default
 default: $(KERNEL_ELF)
+
+.PHONY: info
+info:
+	@echo "CC = $(CC)"
+	@echo "AS = $(AS)"
+	@echo "LD = $(LD)"
+	@echo "CFLAGS  = $(CFLAGS)"
+	@echo "ASFLAGS = $(ASFLAGS)"
+	@echo "LDFLAGS = $(LDFLAGS)"
+	@echo "Kernel sources = $(KERNEL_CSRCS) $(KERNEL_ASRCS)"
 
 .PHONY: all
 all: $(KERNEL_ELF) iso
@@ -50,9 +61,9 @@ all: $(KERNEL_ELF) iso
 # Build the kernel
 .PHONY: $(KERNEL_ELF)
 $(KERNEL_ELF): $(KERNEL_OBJS)
-	$(info LD $@)
+	@echo "LD $@"
 	@$(LD) $(LDFLAGS) -T kernel/linker.ld -o kernel/$@ $(KERNEL_OBJS)
-	$(info GENSYMS $@)
+	@echo "GENSYMS $@"
 	@scripts/gen-symlist kernel/$(KERNEL_ELF) kernel/$(KERNEL_SYMS)
 
 # Generate a bootable ISO
@@ -75,10 +86,14 @@ clean:
 		$(KERNEL_OBJS)					\
 		potatOS.iso
 
-%.o: %.c
-	$(info CC $@)
+# Build the sources
+
+.SUFFIXES: .c .o
+.c.o:
+	@echo "CC $@"
 	@$(CC) $(CFLAGS) -c -o $@ $<
 
-%.o: %.S
-	$(info AS $@)
+.SUFFIXES: .S .o
+.S.o:
+	@echo "AS $@"
 	@$(AS) $(ASFLAGS) -o $@ $<

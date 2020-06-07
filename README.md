@@ -26,16 +26,13 @@ To solve this, append the library paths to the LD_LIBRARY_PATH environment varia
 Run `make` to build the kernel and `make iso` to generate an ISO image.
 To run the ISO image in QEMU, run `scripts/run`.
 
-Utilities required for building from source are:
-* make
-* cat
-* tr
-* cp
-* grub-mkrescue
-* grub-file
-* a POSIX shell
-* rm
-* mkdir
+The following utilities are required for building from source:
+
+* POSIX make
+* POSIX shell
+* POSIX coreutils
+* nasm
 * wget
 * tar
-* nasm
+* grub-mkrescue
+* grub-file
