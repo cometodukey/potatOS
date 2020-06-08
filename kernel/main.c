@@ -42,7 +42,5 @@ kernel_main(uint32_t magic, const MultibootInfo *mb) {
     init_pmm(mb->mmap_addr, mb->mmap_length);
     init_paging();
 
-    kputs("here");
-
     hang();
 }

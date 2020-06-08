@@ -29,18 +29,15 @@ init_paging(void) {
         PANIC("PAE is not supported!");
     }
 
-    /* clear all page directory entries */
-    memset(page_directory, 0, LEN(page_directory));
-
     for (i = 0; i < LEN(page_directory); ++i) {
-        page_directory[i] = ((PAGE_RDWR) & ~(PAGE_RDWR | PAGE_PRESENT));
+        page_directory[i] = 2;
     }
 
     for (i = 0; i < LEN(first_page_table); ++i) {
         first_page_table[i] = (i * PAGE_SIZE) | 3;
     }
 
-    page_directory[0] |= (uint32_t)first_page_table;
+    page_directory[0] |= (uint32_t)first_page_table | 3;
 
     /* point CR3 to the page directory */
     write_cr3((uint32_t)&page_directory);
