@@ -2,6 +2,7 @@
 #define __EXCEPTION_H__
 
 #include <kernel/types.h>
+#include <kernel/attributes.h>
 
 void isr_common_stub(void);
 void exception_div0_handler(void);
@@ -55,6 +56,6 @@ typedef struct {
     size_t edi, esi, ebp, unused, ebx, edx, ecx, eax;
     size_t exception, error;
     size_t eip, cs, eflags, esp, ss;
-} __attribute__((packed)) Registers;
+} __packed Registers;
 
 #endif /* __EXCEPTION_H__ */

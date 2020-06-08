@@ -2,6 +2,7 @@
 #define __GDT_H__
 
 #include <kernel/types.h>
+#include <kernel/attributes.h>
 
 #define GDT_NULL 0
 #define GDT_KERNEL_CS 1
@@ -16,12 +17,12 @@ typedef struct {
     uint8_t  access;
     uint8_t  granularity;
     uint8_t  base_high;
-} __attribute__((packed)) GDTDescriptor;
+} __packed GDTDescriptor;
 
 typedef struct {
     uint16_t limit;
     uint32_t base;
-} __attribute__((packed)) GDTPtr;
+} __packed GDTPtr;
 
 void init_gdt(void);
 

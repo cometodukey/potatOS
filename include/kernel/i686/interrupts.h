@@ -2,6 +2,7 @@
 #define __INTERRUPTS_H__
 
 #include <kernel/types.h>
+#include <kernel/attributes.h>
 
 typedef struct {
    uint16_t base_low;
@@ -9,12 +10,12 @@ typedef struct {
    uint8_t  pad; /* unused */
    uint8_t  type;
    uint16_t base_high;
-} __attribute__((packed)) IDTDescriptor;
+} __packed IDTDescriptor;
 
 typedef struct {
    uint16_t limit;
    uint32_t base;
-} __attribute__((packed)) IDTPtr;
+} __packed IDTPtr;
 
 void init_idt(void);
 void sti(void);

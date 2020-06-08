@@ -6,18 +6,18 @@
 #define CPUID_APIC_BIT (1 << 9)
 
 enum CR0_BITS {
-    CR0_PE = 1 << 0,
+    CR0_PE = 1 << 0,  /* enable protected mode */
     CR0_MP = 1 << 1,
     CR0_EM = 1 << 2,
     CR0_TS = 1 << 3,
     CR0_ES = 1 << 4,
     CR0_NE = 1 << 5,
-    CR0_WP = 1 << 16,
+    CR0_WP = 1 << 16, /* write protected supervisor pages */
     CR0_AM = 1 << 18,
     CR0_NW = 1 << 29,
     CR0_CD = 1 << 30,
     /* C11 doesn't allow enumerator values outside the range of `int` */
-#define CR0_PG (1 << 31)
+#define CR0_PG (1 << 31) /* enable paging */
 };
 
 enum CR4_BITS {
@@ -26,7 +26,7 @@ enum CR4_BITS {
     CR4_TSD        = 1 << 2,
     CR4_DE         = 1 << 3,
     CR4_PSE        = 1 << 4,
-    CR4_PAE        = 1 << 5,
+    CR4_PAE        = 1 << 5, /* enable PAE */
     CR4_MCE        = 1 << 6,
     CR4_PGE        = 1 << 7,
     CR4_PCE        = 1 << 8,

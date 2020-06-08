@@ -22,7 +22,9 @@
 #ifndef MULTIBOOT_HEADER
 #define MULTIBOOT_HEADER 1
 
-#define GRUB_PACKED __attribute__((packed))
+#include <kernel/attributes.h>
+
+#define GRUB_PACKED __packed
 
 /* How many bytes from the start of the file we search for the header.  */
 #define MULTIBOOT_SEARCH			8192
