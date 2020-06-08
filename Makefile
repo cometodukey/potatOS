@@ -1,7 +1,3 @@
-# TODO - apparently GNU Make allows all GNU extensions even when the .POSIX target is specified
-#        find POSIX alternatives to the shell function
-# Portability stuff
-.POSIX:
 .SUFFIXES:
 MAKEFLAGS += --no-builtin-rules --no-builtin-variables
 
@@ -10,6 +6,10 @@ TOOLCHAIN = toolchain/i686-tools
 KERNEL_VERSION = 0.1.0
 KERNEL_ELF     = spud-$(KERNEL_VERSION).elf
 KERNEL_SYMS    = spud-$(KERNEL_VERSION).map
+
+# LD, LDFLAGS
+LD      = $(TOOLCHAIN)/bin/i686-elf-ld
+LDFLAGS = -L$(TOOLCHAIN)/lib
 
 # CFLAGS, CC
 CFLAGS  = -std=c11 -Wall -Wextra -Wpedantic -Werror
@@ -25,20 +25,14 @@ CFLAGS += -DKERNEL_VERSION="$(KERNEL_VERSION)"
 
 ifeq ($(CC), clang)
 CFLAGS += --target=i686-pc-unknown-elf -x c
-LDFLAGS = -L$(TOOLCHAIN)/lib
-else ifeq ($(CC), gcc)
-LDFLAGS = -L$(TOOLCHAIN)/lib
 else
 CC = $(TOOLCHAIN)/bin/i686-elf-gcc
-LDFLAGS = -L$(TOOLCHAIN)/lib -l:libgcc.a
+LDFLAGS += -l:libgcc.a
 endif # $(CC), clang
 
 # AS, ASFLAGS
 AS      = nasm
 ASFLAGS = -f elf32
-
-# LD, LDFLAGS
-LD      = $(TOOLCHAIN)/bin/i686-elf-ld
 
 # Enumerate kernel sources
 KERNEL_CSRCS = $(shell find kernel/ -type f -name "*.c")
@@ -46,26 +40,26 @@ KERNEL_ASRCS = $(shell find kernel/ -type f -name "*.S")
 KERNEL_OBJS  = $(KERNEL_CSRCS:.c=.o) $(KERNEL_ASRCS:.S=.o)
 
 .PHONY: default
-default: $(KERNEL_ELF) info
+default: info $(KERNEL_ELF)
 
 .PHONY: info
 info:
-	@echo "CC = $(CC)"
-	@echo "AS = $(AS)"
-	@echo "LD = $(LD)"
-	@echo "CFLAGS  = $(CFLAGS)"
-	@echo "ASFLAGS = $(ASFLAGS)"
-	@echo "LDFLAGS = $(LDFLAGS)"
-	@echo "Kernel sources = $(KERNEL_CSRCS) $(KERNEL_ASRCS)"
+	$(info CC = $(CC))
+	$(info AS = $(AS))
+	$(info LD = $(LD))
+	$(info CFLAGS  = $(CFLAGS))
+	$(info ASFLAGS = $(ASFLAGS))
+	$(info LDFLAGS = $(LDFLAGS))
+	$(info Kernel sources = $(KERNEL_CSRCS) $(KERNEL_ASRCS))
 
 .PHONY: all
-all: $(KERNEL_ELF) iso info
+all: info $(KERNEL_ELF) iso
 
 # Build the kernel
 $(KERNEL_ELF): $(KERNEL_OBJS)
-	@echo "LD $@"
+	$(info LD $@)
 	@$(LD) $(LDFLAGS) -T kernel/linker.ld -o kernel/$@ $(KERNEL_OBJS)
-	@echo "GENSYMS $@"
+	$(info GENSYMS $@)
 	@scripts/gen-symlist kernel/$(KERNEL_ELF) kernel/$(KERNEL_SYMS)
 
 # Generate a bootable ISO
@@ -82,20 +76,20 @@ iso: $(KERNEL_ELF)
 .PHONY: clean
 clean:
 	@rm -f fsroot/boot/$(KERNEL_SYMS) 	\
-		fsroot/boot/$(KERNEL_ELF)		\
-		kernel/$(KERNEL_SYMS)			\
-		kernel/$(KERNEL_ELF)			\
-		$(KERNEL_OBJS)					\
-		potatOS.iso
+			fsroot/boot/$(KERNEL_ELF)		\
+			kernel/$(KERNEL_SYMS)			\
+			kernel/$(KERNEL_ELF)			\
+			$(KERNEL_OBJS)					\
+			potatOS.iso
 
 # Build the sources
 
 .SUFFIXES: .c .o
 .c.o:
-	@echo "CC $@"
+	$(info CC $@)
 	@$(CC) $(CFLAGS) -c -o $@ $<
 
 .SUFFIXES: .S .o
 .S.o:
-	@echo "AS $@"
+	$(info AS $@)
 	@$(AS) $(ASFLAGS) -o $@ $<

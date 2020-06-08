@@ -1,6 +1,6 @@
-# Spud
+# spud
 
-Spud is an i686 kernel for the potatOS operating system.
+spud is an i686 kernel for the potatOS operating system.
 
 ## Features
 
