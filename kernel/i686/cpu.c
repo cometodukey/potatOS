@@ -61,3 +61,18 @@ write_cr3(uint32_t val) {
                       :
                       : "r" (val));
 }
+
+uint32_t
+read_cr4(void) {
+    uint32_t cr4;
+    __asm__ volatile ("movl %%cr4, %0;"
+                      : "=r" (cr4));
+    return cr4;
+}
+
+void
+write_cr4(uint32_t val) {
+    __asm__ volatile ("movl %0, %%cr4;"
+                      :
+                      : "r" (val));
+}

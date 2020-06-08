@@ -39,8 +39,13 @@ KERNEL_CSRCS = $(shell find kernel/ -type f -name "*.c")
 KERNEL_ASRCS = $(shell find kernel/ -type f -name "*.S")
 KERNEL_OBJS  = $(KERNEL_CSRCS:.c=.o) $(KERNEL_ASRCS:.S=.o)
 
+# Default target - only build the kernel
 .PHONY: default
-default: info $(KERNEL_ELF)
+default: $(KERNEL_ELF)
+
+# Build the kernel and ISO image
+.PHONY: all
+all: $(KERNEL_ELF) iso
 
 .PHONY: info
 info:
@@ -51,9 +56,6 @@ info:
 	$(info ASFLAGS = $(ASFLAGS))
 	$(info LDFLAGS = $(LDFLAGS))
 	$(info Kernel sources = $(KERNEL_CSRCS) $(KERNEL_ASRCS))
-
-.PHONY: all
-all: info $(KERNEL_ELF) iso
 
 # Build the kernel
 $(KERNEL_ELF): $(KERNEL_OBJS)

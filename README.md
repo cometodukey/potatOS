@@ -1,8 +1,6 @@
 # potatOS
 
-An operating system for i686.
-
-# Building from source
+A small operating system for the i686 architecture.
 
 ## Building the kernel
 
@@ -13,7 +11,7 @@ If you want to build with GCC, it is recommended to build GCC and libgcc using `
 The Makefile also relies on the `i686-elf-ld` existing, so you should at least build this before building the kernel.
 It is built in the same way as GCC, by running `scripts/mk-toolchain`.  
 
-If you have problems building the toolchain, read [this](#2-building-the-toolchain) section.  
+If you have problems building the toolchain, read [this](#building-the-toolchain) section.  
 
 Run `make` to build the kernel and `make iso` to generate an ISO image.
 To run the ISO image in QEMU, run `scripts/run`.

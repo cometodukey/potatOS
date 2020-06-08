@@ -1,20 +1,36 @@
 #include <kernel/types.h>
 #include <kernel/i686/cpu.h>
 #include <kernel/mm/paging.h>
+#include <kernel/lib/errno.h>
+#include <kernel/lib/assert.h>
+#include <kernel/mm/pmm.h>
 
-static PageDirectory *pdpte[1024];
-static PageDirectory pde[1024];
-static PageTable pt[1024];
-
-_Static_assert(LEN(pde) >= LEN(pdpte), "PDE is smaller than PDPTE!");
+uintptr_t __attribute__((aligned(PAGE_SIZE))) pdpte_start[1024];
 
 void
 init_paging(void) {
-    size_t i;
-    UNUSED(pt);
-    for (i = 0; i < LEN(pdpte); ++i) {
-        pdpte[i] = &pde[i];
-    }
-    write_cr3((uint32_t)&pdpte);
-    write_cr0(read_cr0());
+    /* point CR3 to the start of the PDPTE */
+    write_cr3((uint32_t)pdpte_start);
+
+    /* set the paging flags in CR0 and CR4 */
+    write_cr0(read_cr0() | CR0_PG);
+    write_cr4(read_cr4() | CR4_PAE);
+}
+
+KernelResult
+map_page(uintptr_t phys_addr, uintptr_t virt_addr, int flags) {
+    UNUSED(phys_addr);
+    UNUSED(virt_addr);
+    UNUSED(flags);
+    return GENERIC_ERR;
+}
+
+KernelResult
+unmap_page() {
+    return GENERIC_ERR;
+}
+
+KernelResult
+remap_page() {
+    return GENERIC_ERR;
 }

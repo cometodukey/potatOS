@@ -22,4 +22,6 @@ typedef struct {
     uintptr_t addr;
 } __attribute__((packed)) PageDirectory;
 
+void init_paging();
+
 #endif /* __PAGING_H__ */

@@ -9,3 +9,5 @@ allow config macros to be set at compile time
 fix console last row bug
 clang-format
 use an LDT?
+
+when userland is implemented - flush cache on context switch

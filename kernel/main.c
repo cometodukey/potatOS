@@ -1,7 +1,7 @@
 #include <kernel/types.h>
 #include <kernel/multiboot.h>
 #include <kernel/lib/clock.h>
-#include <kernel/lib/assert.h>
+//#include <kernel/lib/assert.h>
 #include <kernel/console/console.h>
 #include <kernel/lib/kprintf.h>
 #include <kernel/i686/idle.h>
@@ -10,7 +10,7 @@
 #include <kernel/lib/panic.h>
 #include <kernel/lib/random.h>
 #include <kernel/mm/pmm.h>
-#include <kernel/lib/symbols.h>
+//#include <kernel/lib/symbols.h>
 #include <kernel/serial/serial.h>
 
 const char *version = xstringify(KERNEL_VERSION);

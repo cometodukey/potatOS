@@ -14,7 +14,7 @@ spud is an i686 kernel for the potatOS operating system.
 
 ## TODO
 
-* Paging
+* PAE Paging
 * SMP
 * IPC
 * Scheduling
