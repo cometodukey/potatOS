@@ -18,11 +18,11 @@
 static int has_pae_support(void);
 
 static uint32_t __align(PAGE_SIZE) page_directory[1024];
-static uint32_t __align(PAGE_SIZE) first_page_table[1024];
+static uint32_t __align(PAGE_SIZE) page_tables[1][1024];
 
 void
 init_paging(void) {
-    size_t i;
+    size_t i, j;
 
     kputs("Initialising paging");
     if (!has_pae_support()) {
@@ -33,16 +33,21 @@ init_paging(void) {
         page_directory[i] = 2;
     }
 
-    for (i = 0; i < LEN(first_page_table); ++i) {
-        first_page_table[i] = (i * PAGE_SIZE) | 3;
+    kprintf("%d, %d\n", LEN(page_tables), LEN(*page_tables));
+
+    for (i = 0; i < LEN(page_tables); ++i) {
+        for (j = 0; j < LEN(*page_tables); ++j) {
+            page_tables[i][j] = (j * PAGE_SIZE) | 3;
+            page_directory[i] = (uint32_t)page_tables[i][j] | 3;
+        }
     }
 
-    page_directory[0] |= (uint32_t)first_page_table | 3;
+    // TODO: unmap the first MiB
 
     /* point CR3 to the page directory */
     write_cr3((uint32_t)&page_directory);
 
-    /* paging, write protect supervisor pages */
+    /* enable paging and write protect read-only supervisor pages */
     write_cr0(read_cr0() | CR0_PG | CR0_WP);
 
     /* PAE, 4KB pages, no global pages */
