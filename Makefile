@@ -1,3 +1,4 @@
+# Remove Makes builtin rules and variables
 .SUFFIXES:
 MAKEFLAGS += --no-builtin-rules --no-builtin-variables
 
@@ -7,9 +8,22 @@ KERNEL_VERSION = 0.1.0
 KERNEL_ELF     = spud-$(KERNEL_VERSION).elf
 KERNEL_SYMS    = spud-$(KERNEL_VERSION).map
 
+UNAME = $(shell uname)
+
 # LD, LDFLAGS
-LD      = $(TOOLCHAIN)/bin/i686-elf-ld
 LDFLAGS = -L$(TOOLCHAIN)/lib
+ifeq ($(LD), lld)
+ifeq ($(UNAME), Linux)
+LD = ld.lld
+else ifeq ($(UNAME), Darwin)
+LD = ld64.lld
+else
+# FIXME
+LD = unknown
+endif
+else
+LD = $(TOOLCHAIN)/bin/i686-elf-ld
+endif
 
 # CFLAGS, CC
 CFLAGS  = -std=c11 -Wall -Wextra -Wpedantic -Werror
@@ -28,7 +42,7 @@ CFLAGS += --target=i686-pc-unknown-elf -x c
 else
 CC = $(TOOLCHAIN)/bin/i686-elf-gcc
 LDFLAGS += -l:libgcc.a
-endif # $(CC), clang
+endif
 
 # AS, ASFLAGS
 AS      = nasm
@@ -43,10 +57,6 @@ KERNEL_OBJS  = $(KERNEL_CSRCS:.c=.o) $(KERNEL_ASRCS:.S=.o)
 .PHONY: default
 default: $(KERNEL_ELF)
 
-# Build the kernel and ISO image
-.PHONY: all
-all: $(KERNEL_ELF) iso
-
 .PHONY: info
 info:
 	$(info CC = $(CC))
@@ -60,7 +70,7 @@ info:
 # Build the kernel
 $(KERNEL_ELF): $(KERNEL_OBJS)
 	$(info LD $@)
-	@$(LD) $(LDFLAGS) -T kernel/linker.ld -o kernel/$@ $(KERNEL_OBJS)
+	@$(LD) $(LDFLAGS) -T kernel/kernel.ld -o kernel/$@ $(KERNEL_OBJS)
 	$(info GENSYMS $@)
 	@scripts/gen-symlist kernel/$(KERNEL_ELF) kernel/$(KERNEL_SYMS)
 
