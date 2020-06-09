@@ -1,7 +1,7 @@
 #ifndef __SYMBOLS_H__
 #define __SYMBOLS_H__
 
-#include <kernel/multiboot.h>
+#include <kernel/arch/multiboot.h>
 
 #define SYM_NAME_SIZ 64
 

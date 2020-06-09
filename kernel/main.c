@@ -1,46 +1,40 @@
+#include <kernel/arch/arch.h>
 #include <kernel/types.h>
-#include <kernel/multiboot.h>
-#include <kernel/lib/clock.h>
-#include <kernel/console/console.h>
+#include <kernel/arch/multiboot.h>
 #include <kernel/lib/kprintf.h>
-#include <kernel/i686/idle.h>
-#include <kernel/i686/gdt.h>
-#include <kernel/i686/interrupts.h>
 #include <kernel/lib/panic.h>
-#include <kernel/lib/random.h>
-#include <kernel/mm/pmm.h>
-#include <kernel/serial/serial.h>
-#include <kernel/mm/paging.h>
+#include <kernel/lib/task.h>
+#include <kernel/lib/kmalloc.h>
 
 const char *version = xstringify(KERNEL_VERSION);
-MultibootModule *initramfs = NULL;
-MultibootModule *kernel_syms = NULL;
 
 noreturn void
 kernel_main(uint32_t magic, const MultibootInfo *mb) {
-    //TODO: boot_timestamp = get_timestamp();
-    init_random();
-    init_console();
-    init_serial(SERIAL_COM1_BASE);
+    extern MultibootModule *initramfs;
+    extern const char *cmdline;
+
+    /* initialise architecture specific features first thing */
+    init_arch(magic, mb);
 
     kprintf("spud-%s started\r\n", version);
-    kputs("MIT License. Copyright (c) 2020 Edward Bruce\r\n");
-    // TODO: log the boot time
+    kputs("MIT License. Copyright (c) 2020 Edward Bruce");
 
-    kputs("Loading descriptor tables");
-    init_gdt();
-    init_idt();
-
-    parse_multiboot_info(magic, mb);
+    if (cmdline != NULL) {
+        kprintf("%s\r\n", cmdline);
+    }
     if (initramfs == NULL) {
         PANIC("No initramfs was loaded!");
     }
-    if (kernel_syms == NULL) {
-        kputs("No kernel symbol table was loaded");
+
+    /* initialse the scheduler and kmalloc */
+    init_kmalloc();
+    init_task();
+
+    /* spawn the bootstrap server */
+    // TODO
+
+    /* idle loop - wait for interrupts */
+    for (;;) {
+        idle();
     }
-
-    init_pmm(mb->mmap_addr, mb->mmap_length);
-    init_paging();
-
-    hang();
 }

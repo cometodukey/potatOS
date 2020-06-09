@@ -1,9 +1,9 @@
-#include <kernel/multiboot.h>
+#include <kernel/arch/multiboot.h>
 #include <kernel/lib/kprintf.h>
 #include <kernel/lib/ctype.h>
 #include <kernel/lib/string.h>
 #include <kernel/lib/mem.h>
-#include <kernel/i686/idle.h>
+#include <kernel/arch/arch.h>
 #include <kernel/lib/assert.h>
 #include <kernel/lib/symbols.h>
 #include <kernel/lib/errno.h>

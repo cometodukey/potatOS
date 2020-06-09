@@ -1,7 +1,6 @@
 #include <kernel/types.h>
 #include <kernel/lib/kprintf.h>
-#include <kernel/i686/idle.h>
-#include <kernel/console/vt100.h>
+#include <kernel/arch/arch.h>
 
 noreturn void
 __assert_fail(const char *file,
@@ -11,15 +10,17 @@ __assert_fail(const char *file,
 {
     kprintf("%s:%u: %s: Assertation '%s' failed.\r\n",
             file, line, func, expr);
-    hang();
+    for (;;) {
+        hang();
+    }
 }
 
 /* bit of a hack to get around recursive asserts */
 noreturn void
 __kprint_assert_fail(const char *expr) {
-    vt100_puts("kprint Assertation '");
-    vt100_puts(expr);
-    vt100_puts("' failed!\r\n");
-
-    hang();
+    // FIXME
+    UNUSED(expr);
+    for (;;) {
+        hang();
+    }
 }

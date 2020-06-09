@@ -4,9 +4,9 @@
 #include <kernel/lib/ctype.h>
 #include <kernel/lib/string.h>
 #include <kernel/lib/assert.h>
-#include <kernel/console/console.h>
+#include <kernel/arch/arch.h>
 #include <kernel/lib/kprintf.h>
-#include <kernel/serial/serial.h>
+#include <kernel/arch/arch.h>
 
 #define MAX(x, y) ((x) > (y) ? (x) : (y))
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
@@ -116,9 +116,8 @@ static size_t kprintf_console_buffer_size = 0;
 static char kprintf_console_buffer[KPRINTF_CONSOLE_BUFFER_SIZE] = {0};
 
 void writer_console_flush(void) {
-    if (KPRINTF_PRINT_BOTH)serial_write_string(SERIAL_COM1_BASE, kprintf_console_buffer, kprintf_console_buffer_size);
-    for(size_t i = 0; i < kprintf_console_buffer_size; i++)
-        console_write_cell(MAKE_COLOUR(WHITE, BLACK), kprintf_console_buffer[i]);
+    if (KPRINTF_PRINT_BOTH)serial_put_string(kprintf_console_buffer, kprintf_console_buffer_size);
+    console_put_string(kprintf_console_buffer, kprintf_console_buffer_size);
     memset(kprintf_console_buffer, 0, sizeof(kprintf_console_buffer));
     kprintf_console_buffer_size = 0;
 }
@@ -141,7 +140,7 @@ static size_t kprintf_serial_buffer_size = 0;
 static char kprintf_serial_buffer[KPRINTF_SERIAL_BUFFER_SIZE] = {0};
 
 void writer_serial_flush(void) {
-    serial_write_string(SERIAL_COM1_BASE, kprintf_serial_buffer, kprintf_serial_buffer_size);
+    serial_put_string( kprintf_serial_buffer, kprintf_serial_buffer_size);
     memset(kprintf_serial_buffer, 0, sizeof(kprintf_serial_buffer));
     kprintf_serial_buffer_size = 0;
 }
@@ -745,7 +744,7 @@ parse_atoi_wildcard(char **stream) {
 **    flag is ignored.
 **  - If the space and + flags both appear, the space flag is ignored.
 **  - If the 0 and - flags both appear, the 0 flag is ignored.
-** 
+**
 */
 
 void
