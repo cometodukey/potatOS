@@ -1,9 +1,11 @@
-*.o
-spud-*.img
-potatOS.iso
-spud-*.elf
-spud-*.map
-toolchain/
 .vscode/
-user/
-include/user/
+toolchain/
+
+# Generated build files
+*.o
+*.iso
+*.elf
+*.map
+
+# Temporary ignore
+servers/

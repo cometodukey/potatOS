@@ -1,63 +1,26 @@
 #include <kernel/lib/kprintf.h>
 #include <kernel/types.h>
-#include <kernel/i686/idle.h>
+#include <kernel/arch/arch.h>
 #include <kernel/lib/panic.h>
-#include <kernel/multiboot.h>
-#include <kernel/i686/exception.h>
+#include <kernel/arch/multiboot.h>
 #include <kernel/lib/mem.h>
 #include <kernel/lib/symbols.h>
 
-static void print_registers(const Registers *regs);
-static void do_stack_traceback(void);
-static char *trace_address(size_t *off, size_t addr);
-
-static char name[SYM_NAME_SIZ];
-
 noreturn void
 panic(const char *file, size_t line, const char *func,
-      const Registers *regs, const char *msg, ...)
+      const void *regs, const char *msg, ...)
 {
     va_list args;
     kprintf("Kernel panic in %s:%u:%s\r\n", file, line, func);
     if (regs != NULL) {
-        print_registers(regs);
+        dump_registers(regs);
     }
-    do_stack_traceback();
+    do_stack_trace();
     va_start(args, msg);
     vkprintf((char*)msg, args);
     va_end(args);
     kputs(""); // TODO: write an actual kprint_flush function
-    hang();
-}
-
-static void
-print_registers(const Registers *regs) {
-    kprintf("EAX = %08x EBX    = %08x ECX = %08x EDX = %08x\r\n", regs->eax, regs->ebx, regs->ecx, regs->edx);
-    kprintf("ESI = %08x EDI    = %08x ESP = %08x EBP = %08x\r\n", regs->esi, regs->edi, regs->esp, regs->ebp);
-    kprintf("EIP = %08x EFLAGS = %08x\r\n", regs->eip, regs->eflags);
-    kprintf("CS  = %8.4x DS     = %8.4x SS  = %8.4x\r\n", regs->cs,  regs->ds, regs->ss);
-}
-
-static void
-do_stack_traceback(void) {
-    StackFrame *stack;
-    size_t offset = 0;
-    __asm__ volatile("movl %%ebp, %0" : "=r" (stack));
-    kputs("Stack trace:");
-    for (; stack != NULL; stack = stack->ebp) {
-        kprintf(" [%.8p] %s+%x\r\n",
-                stack->eip, trace_address(&offset, (size_t)stack->eip), offset);
+    for (;;) {
+        hang();
     }
-}
-
-static char *
-trace_address(size_t *off, size_t addr) {
-    extern MultibootModule *kernel_syms;
-    if (kernel_syms == NULL) {
-        *off = 0;
-        return "?";
-    }
-    size_t base = parse_symlist(kernel_syms, name, addr);
-    *off = addr - base;
-    return name;
 }

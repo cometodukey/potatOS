@@ -65,7 +65,6 @@ info:
 	$(info CFLAGS  = $(CFLAGS))
 	$(info ASFLAGS = $(ASFLAGS))
 	$(info LDFLAGS = $(LDFLAGS))
-	$(info Kernel sources = $(KERNEL_CSRCS) $(KERNEL_ASRCS))
 
 # Build the kernel
 $(KERNEL_ELF): $(KERNEL_OBJS)
@@ -78,7 +77,6 @@ $(KERNEL_ELF): $(KERNEL_OBJS)
 # TODO - clean up this rule
 .PHONY: iso
 iso: $(KERNEL_ELF)
-	grub-file --is-x86-multiboot kernel/$(KERNEL_ELF)
 	cp kernel/$(KERNEL_SYMS) fsroot/boot
 	cp kernel/$(KERNEL_ELF)  fsroot/boot
 	scripts/gen-grubcfg $(KERNEL_ELF) $(KERNEL_VERSION) fsroot/boot/grub/grub.cfg
