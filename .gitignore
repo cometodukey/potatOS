@@ -9,3 +9,5 @@ toolchain/
 
 # Temporary ignore
 servers/
+user/
+include/user

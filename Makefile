@@ -36,6 +36,7 @@ CFLAGS += -fno-builtin -fno-common
 CFLAGS += -Wl,-z,max-page-size=0x1000
 CFLAGS += -Iinclude/
 CFLAGS += -DKERNEL_VERSION="$(KERNEL_VERSION)"
+CFLAGS += -fsanitize=undefined
 
 ifeq ($(CC), clang)
 CFLAGS += --target=i686-pc-unknown-elf -x c
@@ -49,7 +50,7 @@ AS      = nasm
 ASFLAGS = -f elf32
 
 # Enumerate kernel sources
-KERNEL_CSRCS = $(shell find kernel/ -type f -name "*.c")
+KERNEL_CSRCS = $(shell find kernel/ -type f -name "*.c") lib/ubsan.c
 KERNEL_ASRCS = $(shell find kernel/ -type f -name "*.S")
 KERNEL_OBJS  = $(KERNEL_CSRCS:.c=.o) $(KERNEL_ASRCS:.S=.o)
 

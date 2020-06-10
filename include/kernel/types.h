@@ -13,6 +13,8 @@
 
 typedef int32_t ssize_t;
 
+typedef uint32_t vaddr_t;
+
 _Static_assert(sizeof(void *) == sizeof(uint32_t), "void * != uint32_t");
 _Static_assert(__CHAR_BIT__ == 8, "__CHAR_BIT__ != 8");
 
