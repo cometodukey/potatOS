@@ -33,8 +33,6 @@ init_paging(void) {
         page_directory[i] = 2;
     }
 
-    kprintf("%d, %d\n", LEN(page_tables), LEN(*page_tables));
-
     for (i = 0; i < LEN(page_tables); ++i) {
         for (j = 0; j < LEN(*page_tables); ++j) {
             page_tables[i][j] = (j * PAGE_SIZE) | 3;

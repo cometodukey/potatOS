@@ -1,5 +1,6 @@
 # TODO
 
+* Deprecate GNU toolchain support
 * PAE paging
 * initramfs
 * ELF support
@@ -12,3 +13,5 @@
 * malloc/free
 * Userland
 * Lockless functions - interrupt safe code
+* Link Time Optimisation
+* Clean up library stuff and make them portable between kernel and user
