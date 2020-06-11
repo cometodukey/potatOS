@@ -47,8 +47,10 @@ init_paging(void) {
     write_cr0(read_cr0() | CR0_PG | CR0_WP);
 
     arch_map_page(kernel_page_directory, (uintptr_t)NULL,            (uintptr_t)NULL, 0);
-    arch_map_page(kernel_page_directory, (uintptr_t)MEM_BASE * 4,    (uintptr_t)NULL, 0);
-    arch_map_page(kernel_page_directory, (uintptr_t)UINT32_MAX-4096, (uintptr_t)NULL, 0);
+    arch_map_page(kernel_page_directory, (uintptr_t)PAGE_SIZE,       (uintptr_t)NULL, 0);
+    // arch_map_page(kernel_page_directory, (uintptr_t)MEM_BASE * 4,    (uintptr_t)NULL, 0);
+    // arch_map_page(kernel_page_directory, (uintptr_t)UINT32_MAX-4096, (uintptr_t)NULL, 0);
+    // arch_map_page(kernel_page_directory, (uintptr_t)UINT32_MAX,      (uintptr_t)NULL, 0);
 
     /* PAE, 4KB pages, no global pages */
     //write_cr4((read_cr4() | CR4_PAE) & ~(CR4_PSE | CR4_PGE));
@@ -64,18 +66,21 @@ has_pae_support(void) {
 KernelResult
 arch_map_page(uint32_t pd[1024], uintptr_t phys_addr, uintptr_t virt_addr, int flags) {
     uint32_t *pt, *tmp;
+    int pmm_used = 0;
     /* find the page directory and page table offset */
-    uint32_t pd_entry = (phys_addr / PAGE_SIZE) / 1024;
-    uint32_t pt_entry = (phys_addr / PAGE_SIZE) / 1024;
-    int pmm_used;
+    uint32_t pd_entry = phys_addr / (MEM_BASE * 4);
+    uint32_t pt_entry = (phys_addr / PAGE_SIZE) % 1024;
 
-    /* identity map a new table if not existing already */
+    kprintf("addr = %.8p, pd_entry = %u, pt_entry = %u\r\n", phys_addr, pd_entry, pt_entry);
+
+    /* allocate a new table if one does not exist already */
     if ((pd[pd_entry] & PAGE_MASK) == (uint32_t)NULL) {
         tmp = arch_pmm_zalloc();
         if (tmp == NULL) {
             return GENERIC_ERR;
         }
         pd[pd_entry] |= (uint32_t)tmp;
+        /* identity map the new page */
         if (arch_map_page(pd, (uintptr_t)tmp, (uintptr_t)tmp, PAGE_PRESENT | PAGE_RDWR) == GENERIC_ERR) {
             arch_pmm_free(tmp);
             return GENERIC_ERR;
@@ -86,7 +91,7 @@ arch_map_page(uint32_t pd[1024], uintptr_t phys_addr, uintptr_t virt_addr, int f
     /* if page is already mapped, free the table if it was mapped here and return an error */
     if ((pt[pt_entry] & PAGE_MASK) != (uint32_t)NULL) {
         if (pmm_used) {
-            arch_pmm_free((void *)pd[pd_entry & PAGE_MASK]);
+            arch_pmm_free((void *)(pd[pd_entry] & PAGE_MASK));
             pd[pd_entry] &= ~PAGE_MASK;
         }
         return GENERIC_ERR;

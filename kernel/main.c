@@ -26,7 +26,7 @@ kernel_main(uint32_t magic, const MultibootInfo *mb) {
         PANIC("No initramfs was loaded!");
     }
 
-    /* initialse the scheduler and kmalloc */
+    /* initialise the scheduler and kmalloc */
     init_kmalloc();
     init_task();
 

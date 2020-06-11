@@ -28,3 +28,4 @@ Documentation can be found [here](docs/README.md).
 * PIE/PIC
 * Tidy up the Makefile
 * Handle exceptions better
+* Ensure panic/assert cannot receive interrupts
