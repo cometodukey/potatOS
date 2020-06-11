@@ -15,3 +15,4 @@
 * Lockless functions - interrupt safe code
 * Link Time Optimisation
 * Clean up library stuff and make them portable between kernel and user
+* PIE/PIC

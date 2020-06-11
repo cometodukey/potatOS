@@ -101,7 +101,7 @@ arch_pmm_alloc(void) {
             goto free_page;
         }
     }
-    PANIC("Out of physical memory!");
+    return NULL;
 free_page:
     set_bitmap(i);
     return ((void *)(uintptr_t)(PAGE_SIZE * i));
@@ -110,6 +110,9 @@ free_page:
 void *
 arch_pmm_zalloc(void) {
     void *page = arch_pmm_alloc();
+    if (page == NULL) {
+        return NULL;
+    }
     memset(page, 0, PAGE_SIZE);
     return page;
 }

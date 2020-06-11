@@ -20,7 +20,7 @@ kernel_main(uint32_t magic, const MultibootInfo *mb) {
     kputs("MIT License. Copyright (c) 2020 Edward Bruce");
 
     if (cmdline != NULL) {
-        kprintf("%s\r\n", cmdline);
+        kprintf("Command line: %s\r\n", cmdline);
     }
     if (initramfs == NULL) {
         PANIC("No initramfs was loaded!");

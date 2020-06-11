@@ -25,3 +25,6 @@ Documentation can be found [here](docs/README.md).
 * initramfs
 * Userspace
 * Kernel build config
+* PIE/PIC
+* Tidy up the Makefile
+* Handle exceptions better

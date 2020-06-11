@@ -18,9 +18,11 @@ https://reviews.llvm.org/D54604
 * ASan
 * MSan
 * TSan
+* LSan
 * W^X
 * PAC
 * CFI
 * ASLR
 * SafeStack
 * ShadowCallStack
+* Mandatory ASLR in the kernel
