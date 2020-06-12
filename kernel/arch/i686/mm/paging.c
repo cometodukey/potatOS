@@ -16,29 +16,40 @@
 //        PAE support
 
 static int has_pae_support(void);
+static void invlpg(uintptr_t addr);
 
 static uint32_t __align(PAGE_SIZE) kernel_page_directory[1024];
-static uint32_t __align(PAGE_SIZE) first_mib_page_table[1024];
 
 void
 init_paging(void) {
     size_t i;
+    uintptr_t addr;
 
     if (!has_pae_support()) {
         PANIC("PAE is not supported!");
     }
 
-    /* mark each page table as not present */
+    /* NULL each entry - this forces physical pages to be mapped later on */
     for (i = 0; i < LEN(kernel_page_directory); ++i) {
-        kernel_page_directory[i] = !PAGE_PRESENT;
+        kernel_page_directory[i] = 0;
     }
 
     /* identity map the first 4MiB */
-    for (i = 0; i < LEN(first_mib_page_table); ++i) {
-        first_mib_page_table[i] = (i * PAGE_SIZE) | (PAGE_RDWR | PAGE_PRESENT);
-    }
+    // for (i = 0; i < LEN(first_mib_page_table); ++i) {
+    //     first_mib_page_table[i] = (i * PAGE_SIZE) | (PAGE_RDWR | PAGE_PRESENT);
+    // }
     /* make the first entry present, readable and writeable */
-    kernel_page_directory[0] = (uint32_t)first_mib_page_table | (PAGE_RDWR | PAGE_PRESENT);
+    // kernel_page_directory[0] = (uint32_t)first_mib_page_table | (PAGE_RDWR | PAGE_PRESENT);
+
+    /* identity map the first MiB */
+    for (i = 1; i < 1024; ++i) {
+        addr = i * PAGE_SIZE;
+        arch_map_page(kernel_page_directory, addr, addr, PAGE_RDWR | PAGE_PRESENT);
+    }
+    /* map the zero page and make it not present */
+    arch_map_page(kernel_page_directory, (uintptr_t)NULL, (uintptr_t)NULL, 0);
+
+    kernel_page_directory[0] |= (PAGE_RDWR | PAGE_PRESENT);
 
     /* point CR3 to the kernels page directory */
     write_cr3((uint32_t)kernel_page_directory);
@@ -46,11 +57,14 @@ init_paging(void) {
     /* enable paging and write protect read-only supervisor pages */
     write_cr0(read_cr0() | CR0_PG | CR0_WP);
 
-    arch_map_page(kernel_page_directory, (uintptr_t)NULL,            (uintptr_t)NULL, 0);
-    arch_map_page(kernel_page_directory, (uintptr_t)PAGE_SIZE,       (uintptr_t)NULL, 0);
-    // arch_map_page(kernel_page_directory, (uintptr_t)MEM_BASE * 4,    (uintptr_t)NULL, 0);
-    // arch_map_page(kernel_page_directory, (uintptr_t)UINT32_MAX-4096, (uintptr_t)NULL, 0);
-    // arch_map_page(kernel_page_directory, (uintptr_t)UINT32_MAX,      (uintptr_t)NULL, 0);
+    // TODO
+    // identity map the first MiB
+    // mark the first MiB as not present
+    // map the pages under the kernel somewhere else
+    // map the pages under multiboot modules somewhere else
+    // set up a new stack with guard page
+    // make text and rodata read only
+    // identity map video buffer
 
     /* PAE, 4KB pages, no global pages */
     //write_cr4((read_cr4() | CR4_PAE) & ~(CR4_PSE | CR4_PGE));
@@ -63,41 +77,48 @@ has_pae_support(void) {
     return edx & CPUID_PAE_BIT;
 }
 
+static void
+invlpg(uintptr_t addr) {
+    __asm__ volatile ("invlpg (%0);"
+                      : : "r" (addr)
+                      : "memory");
+}
+
 KernelResult
 arch_map_page(uint32_t pd[1024], uintptr_t phys_addr, uintptr_t virt_addr, int flags) {
-    uint32_t *pt, *tmp;
+    void *tmp;
     int pmm_used = 0;
-    /* find the page directory and page table offset */
-    uint32_t pd_entry = phys_addr / (MEM_BASE * 4);
-    uint32_t pt_entry = (phys_addr / PAGE_SIZE) % 1024;
+    uint32_t *pt;
 
-    kprintf("addr = %.8p, pd_entry = %u, pt_entry = %u\r\n", phys_addr, pd_entry, pt_entry);
+    /* find the table indices using the physical address */
+    int pd_entry = virt_addr >> 22;
+    int pt_entry = (virt_addr >> 12) & 0x3FF;
 
-    /* allocate a new table if one does not exist already */
-    if ((pd[pd_entry] & PAGE_MASK) == (uint32_t)NULL) {
-        tmp = arch_pmm_zalloc();
-        if (tmp == NULL) {
+    assert(!((int)pd % PAGE_SIZE));
+    assert(!(phys_addr % PAGE_SIZE));
+    assert(!(virt_addr % PAGE_SIZE));
+
+    if ((void *)(pd[pd_entry] & PAGE_MASK) == NULL) {
+        if ((void *)(tmp = arch_pmm_zalloc()) == NULL) {
             return GENERIC_ERR;
         }
         pd[pd_entry] |= (uint32_t)tmp;
-        /* identity map the new page */
-        if (arch_map_page(pd, (uintptr_t)tmp, (uintptr_t)tmp, PAGE_PRESENT | PAGE_RDWR) == GENERIC_ERR) {
-            arch_pmm_free(tmp);
-            return GENERIC_ERR;
-        }
         pmm_used = 1;
     }
     pt = (void *)(pd[pd_entry] & PAGE_MASK);
-    /* if page is already mapped, free the table if it was mapped here and return an error */
-    if ((pt[pt_entry] & PAGE_MASK) != (uint32_t)NULL) {
+    if ((void *)(pt[pt_entry] & PAGE_MASK) != NULL) {
         if (pmm_used) {
-            arch_pmm_free((void *)(pd[pd_entry] & PAGE_MASK));
+            arch_pmm_free(tmp);
             pd[pd_entry] &= ~PAGE_MASK;
         }
         return GENERIC_ERR;
     }
-    /* map `phys_addr` to `virt_addr` with `flags` attributes */
-    pt[pt_entry] = virt_addr | flags;
+    pt[pt_entry] |= (phys_addr | flags);
+    /* reload CR3 if the page directory is loaded */
+    if (read_cr3() == (uint32_t)pd) {
+        // TODO - TLB shootdown
+        invlpg(virt_addr);
+    }
     return GENERIC_SUCCESS;
 }
 

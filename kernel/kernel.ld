@@ -3,6 +3,8 @@ ENTRY(_start)
 SECTIONS {
     . = 1M;
 
+    __kernel_img_start = .;
+
     .text ALIGN(4K) : {
         KEEP(*(.boot));
         *(.text);
@@ -25,4 +27,6 @@ SECTIONS {
         *(.bss.*);
         section_bss_end = .;
     }
+
+    __kernel_img_end = .;
 }

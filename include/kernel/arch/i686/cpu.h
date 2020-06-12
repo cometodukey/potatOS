@@ -51,6 +51,7 @@ void wrmsr(uint32_t ecx, uint32_t eax, uint32_t edx);
 uint32_t read_cr2(void);
 uint32_t read_cr0(void);
 void write_cr0(uint32_t val);
+uint32_t read_cr3(void);
 void write_cr3(uint32_t val);
 uint32_t read_cr4(void);
 void write_cr4(uint32_t val);

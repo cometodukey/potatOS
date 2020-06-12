@@ -36,12 +36,24 @@ init_arch(uint32_t magic, const MultibootInfo *mb) {
     idle               = arch_idle;
     hang               = arch_hang;
 
-    init_cpu();
-    init_serial(SERIAL_COM1_BASE);
-    init_console();
-    parse_multiboot_info(magic, mb);
+    /* load descriptor tables */
     init_gdt();
     init_idt();
+
+    /* zero CR3 */
+    write_cr3((uintptr_t)NULL);
+
+    /* set up CPU features */
+    init_cpu();
+
+    init_serial(SERIAL_COM1_BASE);
+    init_console();
+
+    /* enumerate module list, find kernel command line, etc */
+    parse_multiboot_info(magic, mb);
+
+    /* initialise memory systems */
     init_pmm(mb->mmap_addr, mb->mmap_length);
     init_paging();
+    // TODO - set up a new stack and guard page after paging is initialised
 }

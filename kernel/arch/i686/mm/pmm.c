@@ -83,6 +83,8 @@ init_pmm(uint32_t mmap_start, size_t mmap_len) {
         }
     }
 
+    // TODO - map the pages under the kernel and multiboot modules and video buffer
+
     if (usable_mem < MIN_MEM) {
         PANIC("Not enough usable RAM! Found %uMiB but at least %uMiB is required",
                 BYTE_TO_MIB(usable_mem), BYTE_TO_MIB(MIN_MEM));

@@ -1,4 +1,5 @@
 #include <kernel/arch/i686/isr/exception.h>
+#include <kernel/arch/i686/cpu.h>
 #include <kernel/lib/kprintf.h>
 #include <kernel/lib/panic.h>
 #include <kernel/lib/assert.h>
@@ -43,5 +44,8 @@ void
 exception_handler(const Registers *regs) {
     assert(regs->exception < LEN(names));
     // TODO - save CR2 on PF
+    if (regs->exception == PAGE_FAULT) {
+        kprintf("CR2 = %08X\r\n", read_cr2());
+    }
     kprintf("Received exception %s (%d) with error code %d\r\n", names[regs->exception], regs->exception, regs->error);
 }
