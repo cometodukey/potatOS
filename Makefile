@@ -80,7 +80,7 @@ $(KERNEL_ELF): $(KERNEL_OBJS)
 iso: $(KERNEL_ELF)
 	cp kernel/$(KERNEL_SYMS) fsroot/boot
 	cp kernel/$(KERNEL_ELF)  fsroot/boot
-	scripts/gen-grubcfg $(KERNEL_ELF) $(KERNEL_VERSION) fsroot/boot/grub/grub.cfg
+	sh scripts/gen-grubcfg $(KERNEL_ELF) $(KERNEL_VERSION) fsroot/boot/grub/grub.cfg
 	grub-mkrescue -o potatOS.iso fsroot/
 
 # Clean build files
