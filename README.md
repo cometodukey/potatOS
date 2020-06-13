@@ -1,4 +1,5 @@
 # potatOS
+[![Actions Status](https://github.com/cometodukey/potatOS/workflows/nix-build/badge.svg?branch=develop)](https://github.com/cometodukey/potatOS/actions)
 
 potatOS is a small operating system for i686.
 
