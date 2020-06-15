@@ -11,13 +11,5 @@ in pkgs.mkShell {
     xorriso
     gdb
     clang_10
-
-    # libraries
-    gmp
-    mpfr
-    libmpc
-    isl
-    zstd
-
   ];
 }

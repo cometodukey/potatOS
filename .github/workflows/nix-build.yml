@@ -3,7 +3,7 @@ on:
   pull_request:
   push:
 jobs:
-  tests:
+  build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -11,3 +11,7 @@ jobs:
       with:
         nix_path: nixpkgs=channel:nixos-unstable
     - run: nix-build
+    - uses: actions/upload-artifact@v1
+      with:
+        name: potatOS.iso
+        path: result/iso/potatOS.iso
