@@ -1,7 +1,5 @@
 #include <kernel/arch/i686/tables/gdt.h>
 
-// TODO: set userspace gdt
-
 extern void lgdt(uint32_t ptr);
 static void gdt_entry(int32_t num, uint32_t base,
                          uint32_t limit, uint8_t access, uint8_t gran);
@@ -17,8 +15,8 @@ init_gdt(void) {
     /* null */
     gdt_entry(GDT_NULL, 0, 0, 0, 0);
     /* kernel */
-    gdt_entry(GDT_KERNEL_CS, 0, 0xFFFFFFFF, 0x9A, 0xCF);
-    gdt_entry(GDT_KERNEL_DS, 0, 0xFFFFFFFF, 0x92, 0xCF);
+    gdt_entry(GDT_KERNEL_CS, 0, 0xFFFFF, 0x9A, 0xCF);
+    gdt_entry(GDT_KERNEL_DS, 0, 0xFFFFF, 0x92, 0xCF);
     /* userland */
     gdt_entry(GDT_USER_CS, 0, 0xFFFFFFFF, 0xFA, 0xCF);
     gdt_entry(GDT_USER_DS, 0, 0xFFFFFFFF, 0xF2, 0xCF);

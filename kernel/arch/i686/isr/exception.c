@@ -3,6 +3,7 @@
 #include <kernel/lib/kprintf.h>
 #include <kernel/lib/panic.h>
 #include <kernel/lib/assert.h>
+#include <kernel/arch/arch.h>
 
 /* '?' are reserved exceptions */
 static const char *names[] = {
@@ -48,4 +49,6 @@ exception_handler(const Registers *regs) {
         kprintf("CR2 = %08X\r\n", read_cr2());
     }
     kprintf("Received exception %s (%d) with error code %d\r\n", names[regs->exception], regs->exception, regs->error);
+    // dump_registers(regs);
+    do_stack_trace();
 }

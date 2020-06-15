@@ -40,9 +40,6 @@ init_arch(uint32_t magic, const MultibootInfo *mb) {
     init_gdt();
     init_idt();
 
-    /* zero CR3 */
-    write_cr3((uintptr_t)NULL);
-
     /* set up CPU features */
     init_cpu();
 

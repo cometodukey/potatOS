@@ -29,26 +29,18 @@ init_paging(void) {
         PANIC("PAE is not supported!");
     }
 
-    /* NULL each entry - this forces physical pages to be mapped later on */
+    /* zero each entry */
     for (i = 0; i < LEN(kernel_page_directory); ++i) {
-        kernel_page_directory[i] = 0;
+        kernel_page_directory[i] = !PAGE_PRESENT;
     }
-
-    /* identity map the first 4MiB */
-    // for (i = 0; i < LEN(first_mib_page_table); ++i) {
-    //     first_mib_page_table[i] = (i * PAGE_SIZE) | (PAGE_RDWR | PAGE_PRESENT);
-    // }
-    /* make the first entry present, readable and writeable */
-    // kernel_page_directory[0] = (uint32_t)first_mib_page_table | (PAGE_RDWR | PAGE_PRESENT);
 
     /* identity map the first MiB */
     for (i = 1; i < 1024; ++i) {
         addr = i * PAGE_SIZE;
-        arch_map_page(kernel_page_directory, addr, addr, PAGE_RDWR | PAGE_PRESENT);
+        arch_map_page(kernel_page_directory, addr, addr, (PAGE_RDWR | PAGE_PRESENT));
     }
-    /* map the zero page and make it not present */
-    arch_map_page(kernel_page_directory, (uintptr_t)NULL, (uintptr_t)NULL, 0);
-
+    /* make the zero page not present */
+    arch_map_page(kernel_page_directory, (uintptr_t)NULL, (uintptr_t)NULL, PAGE_PRESENT);
     kernel_page_directory[0] |= (PAGE_RDWR | PAGE_PRESENT);
 
     /* point CR3 to the kernels page directory */
@@ -57,14 +49,8 @@ init_paging(void) {
     /* enable paging and write protect read-only supervisor pages */
     write_cr0(read_cr0() | CR0_PG | CR0_WP);
 
-    // TODO
-    // identity map the first MiB
-    // mark the first MiB as not present
-    // map the pages under the kernel somewhere else
-    // map the pages under multiboot modules somewhere else
-    // set up a new stack with guard page
-    // make text and rodata read only
-    // identity map video buffer
+    // 10 bytes into the zero page
+    *(volatile int *)0xa = 0xbadc0de;
 
     /* PAE, 4KB pages, no global pages */
     //write_cr4((read_cr4() | CR4_PAE) & ~(CR4_PSE | CR4_PGE));
@@ -116,7 +102,7 @@ arch_map_page(uint32_t pd[1024], uintptr_t phys_addr, uintptr_t virt_addr, int f
     pt[pt_entry] |= (phys_addr | flags);
     /* reload CR3 if the page directory is loaded */
     if (read_cr3() == (uint32_t)pd) {
-        // TODO - TLB shootdown
+        // TODO - TLB shootdown when SMP is implemented
         invlpg(virt_addr);
     }
     return GENERIC_SUCCESS;

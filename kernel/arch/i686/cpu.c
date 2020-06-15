@@ -1,9 +1,12 @@
 #include <kernel/types.h>
 #include <kernel/arch/arch.h>
+#include <kernel/arch/i686/cpu.h>
 
 void
 init_cpu(void) {
     // TODO - setup CPU features
+    /* zero CR3 */
+    write_cr3((uint32_t)NULL);
 }
 
 // TODO: check this is correct for IA-32
