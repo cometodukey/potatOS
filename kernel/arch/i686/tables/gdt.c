@@ -15,8 +15,8 @@ init_gdt(void) {
     /* null */
     gdt_entry(GDT_NULL, 0, 0, 0, 0);
     /* kernel */
-    gdt_entry(GDT_KERNEL_CS, 0, 0xFFFFF, 0x9A, 0xCF);
-    gdt_entry(GDT_KERNEL_DS, 0, 0xFFFFF, 0x92, 0xCF);
+    gdt_entry(GDT_KERNEL_CS, 0, 0xFFFFFFFF, 0x9A, 0xCF);
+    gdt_entry(GDT_KERNEL_DS, 0, 0xFFFFFFFF, 0x92, 0xCF);
     /* userland */
     gdt_entry(GDT_USER_CS, 0, 0xFFFFFFFF, 0xFA, 0xCF);
     gdt_entry(GDT_USER_DS, 0, 0xFFFFFFFF, 0xF2, 0xCF);
