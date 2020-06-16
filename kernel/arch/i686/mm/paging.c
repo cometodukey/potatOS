@@ -35,22 +35,22 @@ init_paging(void) {
     }
 
     /* identity map the first MiB */
-    for (i = 1; i < 1024; ++i) {
+    for (i = 0; i < 1024; ++i) {
         addr = i * PAGE_SIZE;
-        arch_map_page(kernel_page_directory, addr, addr, (PAGE_RDWR | PAGE_PRESENT));
+        paging_map_page(kernel_page_directory, addr, addr, PAGE_RDWR);
     }
     /* make the zero page not present */
-    arch_map_page(kernel_page_directory, (uintptr_t)NULL, (uintptr_t)NULL, PAGE_PRESENT);
+    // paging_map_page(kernel_page_directory, (uintptr_t)NULL, (uintptr_t)NULL, PAGE_RDWR);
     kernel_page_directory[0] |= (PAGE_RDWR | PAGE_PRESENT);
 
     /* point CR3 to the kernels page directory */
     write_cr3((uint32_t)kernel_page_directory);
 
     /* enable paging and write protect read-only supervisor pages */
-    write_cr0(read_cr0() | CR0_PG | CR0_WP);
+    // write_cr0(read_cr0() | CR0_PG | CR0_WP);
 
     // 10 bytes into the zero page
-    *(volatile int *)0xa = 0xbadc0de;
+    // *(volatile int *)0xa = 0xbadc0de;
 
     /* PAE, 4KB pages, no global pages */
     //write_cr4((read_cr4() | CR4_PAE) & ~(CR4_PSE | CR4_PGE));
@@ -70,50 +70,63 @@ invlpg(uintptr_t addr) {
                       : "memory");
 }
 
-KernelResult
-arch_map_page(uint32_t pd[1024], uintptr_t phys_addr, uintptr_t virt_addr, int flags) {
-    void *tmp;
-    int pmm_used = 0;
-    uint32_t *pt;
-
-    /* find the table indices using the physical address */
-    int pd_entry = virt_addr >> 22;
-    int pt_entry = (virt_addr >> 12) & 0x3FF;
-
-    assert(!((int)pd % PAGE_SIZE));
-    assert(!(phys_addr % PAGE_SIZE));
-    assert(!(virt_addr % PAGE_SIZE));
-
-    if ((void *)(pd[pd_entry] & PAGE_MASK) == NULL) {
-        if ((void *)(tmp = arch_pmm_zalloc()) == NULL) {
-            return GENERIC_ERR;
-        }
-        pd[pd_entry] |= (uint32_t)tmp;
-        pmm_used = 1;
+uint32_t *
+paging_get_page(uint32_t *dir, uintptr_t virt, int flags, int create) {
+    if (virt % PAGE_SIZE) {
+        PANIC("Attempt to get page table entry from unaligned address %.8p!", virt);
     }
-    pt = (void *)(pd[pd_entry] & PAGE_MASK);
-    if ((void *)(pt[pt_entry] & PAGE_MASK) != NULL) {
-        if (pmm_used) {
-            arch_pmm_free(tmp);
-            pd[pd_entry] &= ~PAGE_MASK;
-        }
+
+    // TODO - macros to get the indexes?
+    uint32_t dir_index = virt >> 22;
+    uint32_t table_index = (virt >> 12) & 0x3FF;
+
+    // uint32_t *dir = (uint32_t *)0xFFFFF000;
+    // uint32_t *table = (uint32_t *)(0xFFC00000 + (dir_index << 12));
+    uint32_t *table = (uint32_t *)(dir[dir_index] & PAGE_MASK);
+
+    if (!(dir[dir_index] & PAGE_PRESENT) && create) {
+        uint32_t *new_table = arch_pmm_alloc();
+        dir[dir_index] = (uint32_t) new_table
+            | PAGE_PRESENT | PAGE_RDWR | (flags & PAGE_FLAGS_MASK);
+        memset((void*) table, 0, 4096);
+    }
+
+    if (dir[dir_index] & PAGE_PRESENT) {
+        return &table[table_index];
+    }
+
+    return NULL;
+}
+
+KernelResult
+paging_map_page(uint32_t *dir, uintptr_t phys, uintptr_t virt, int flags) {
+    uint32_t *page = paging_get_page(dir, virt, flags, 1);
+    if (page == NULL) {
+        kprintf("paging_get_page failed to get %.8p\r\n", virt);
         return GENERIC_ERR;
     }
-    pt[pt_entry] |= (phys_addr | flags);
-    /* reload CR3 if the page directory is loaded */
-    if (read_cr3() == (uint32_t)pd) {
-        // TODO - TLB shootdown when SMP is implemented
-        invlpg(virt_addr);
+
+    /* enforce 4096 byte alignment */
+    if (phys % PAGE_SIZE) {
+        PANIC("Attempt to map unaligned physical address %.8p!", phys);
     }
+    if ((uintptr_t)dir % PAGE_SIZE) {
+        PANIC("Attempt to map into unaligned page directory %.8p!", dir);
+    }
+
+    /* detect previous mappings */
+    if ((*page & PAGE_PRESENT) || ((*page & PAGE_MASK) != 0)) {
+        PANIC("Attempt to map already mapped page %.8p -> %.8p\r\nPrevious mapping %.8p -> %.8p",
+              virt, phys, virt, *page & PAGE_MASK);
+    }
+
+    /* map the page */
+    *page = phys | PAGE_PRESENT | (flags & PAGE_FLAGS_MASK);
+
+    /* invalidate the new mapping if `dir` is the current page directory */
+    if (read_cr3() == (uint32_t)dir) {
+        invlpg(virt);
+    }
+
     return GENERIC_SUCCESS;
-}
-
-KernelResult
-arch_unmap_page() {
-    return GENERIC_ERR;
-}
-
-KernelResult
-arch_remap_page() {
-    return GENERIC_ERR;
 }

@@ -16,7 +16,9 @@ enum {
     PAGE_CD      = 1 << 4
 };
 
+#define PAGE_FLAGS_MASK 0xFFF
+
 void init_paging();
-KernelResult arch_map_page(uint32_t page_directory[1024], uintptr_t phys_addr, uintptr_t virt_addr, int flags);
+KernelResult paging_map_page(uint32_t *dir, uintptr_t phys, uintptr_t virt, int flags);
 
 #endif /* __PAGING_H__ */
