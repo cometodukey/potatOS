@@ -49,6 +49,6 @@ exception_handler(const Registers *regs) {
         kprintf("CR2 = %08X\r\n", read_cr2());
     }
     kprintf("Received exception %s (%d) with error code %d. Faulting EIP %08X\r\n", names[regs->exception], regs->exception, regs->error, regs->eip);
-    // dump_registers(regs);
+    dump_registers(regs);
     do_stack_trace();
 }

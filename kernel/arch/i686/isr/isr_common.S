@@ -51,6 +51,7 @@ extern pic_eoi
 
 %macro EXCEPTION_NO_ERR 1
     cli
+    cld
     push 0
     push %1
     jmp exception_common_stub
@@ -58,6 +59,7 @@ extern pic_eoi
 
 %macro EXCEPTION_HAS_ERR 1
     cli
+    cld
     push %1
     jmp exception_common_stub
 %endmacro
@@ -88,10 +90,9 @@ isr_common_stub:
     iret
 
 exception_common_stub:
-    ; TODO: check that exception, error code, eip, esp, cs, ss, eflags, es, gs, fs are correct
+    mov eax, dword [esp+8] ; FIXME - bizarre hack to get around infinite fault loop
     ; save registers
     pushad
-    cld
 
     ; load the kernel data segment
     xor eax, eax
@@ -104,11 +105,10 @@ exception_common_stub:
     mov gs, ax
     mov ss, ax
 
-    ; pass a pointer to the registers
+    ; pass a pointer to the registers to the handler
     push esp
     call exception_handler
-
-    pop eax
+    add esp, 4
 
     ; restore the previous data segment
     pop eax
