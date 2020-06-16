@@ -9,12 +9,6 @@
 #include <kernel/attributes.h>
 #include <kernel/lib/mem.h>
 
-// TODO - i may need global pages at some point so remember to come back and enable them
-//        set CR4.SMEP and CR4.SMAP?
-//        set IA32_EFER.NXE
-//        check for paging support - see Intel SDM Volume 3 Chapter 4.1.4
-//        PAE support
-
 static int has_pae_support(void);
 static void invlpg(uintptr_t addr);
 
@@ -35,7 +29,7 @@ init_paging(void) {
     }
 
     /* identity map the first MiB */
-    for (i = 0; i < 1024; ++i) {
+    for (i = 1; i < 1024; ++i) {
         addr = i * PAGE_SIZE;
         paging_map_page(kernel_page_directory, addr, addr, PAGE_RDWR);
     }
@@ -47,10 +41,7 @@ init_paging(void) {
     write_cr3((uint32_t)kernel_page_directory);
 
     /* enable paging and write protect read-only supervisor pages */
-    // write_cr0(read_cr0() | CR0_PG | CR0_WP);
-
-    // 10 bytes into the zero page
-    // *(volatile int *)0xa = 0xbadc0de;
+    write_cr0(read_cr0() | CR0_PG | CR0_WP);
 
     /* PAE, 4KB pages, no global pages */
     //write_cr4((read_cr4() | CR4_PAE) & ~(CR4_PSE | CR4_PGE));
@@ -79,16 +70,15 @@ paging_get_page(uint32_t *dir, uintptr_t virt, int flags, int create) {
     // TODO - macros to get the indexes?
     uint32_t dir_index = virt >> 22;
     uint32_t table_index = (virt >> 12) & 0x3FF;
-
-    // uint32_t *dir = (uint32_t *)0xFFFFF000;
-    // uint32_t *table = (uint32_t *)(0xFFC00000 + (dir_index << 12));
     uint32_t *table = (uint32_t *)(dir[dir_index] & PAGE_MASK);
 
     if (!(dir[dir_index] & PAGE_PRESENT) && create) {
-        uint32_t *new_table = arch_pmm_alloc();
-        dir[dir_index] = (uint32_t) new_table
-            | PAGE_PRESENT | PAGE_RDWR | (flags & PAGE_FLAGS_MASK);
-        memset((void*) table, 0, 4096);
+        uint32_t *new_table = arch_pmm_zalloc();
+        if (new_table == NULL) {
+            return NULL;
+        }
+        table = new_table;
+        dir[dir_index] = (uint32_t)table | PAGE_PRESENT | PAGE_RDWR | (flags & PAGE_FLAGS_MASK);
     }
 
     if (dir[dir_index] & PAGE_PRESENT) {
