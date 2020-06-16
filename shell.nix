@@ -3,19 +3,13 @@ in pkgs.mkShell {
   buildInputs = with pkgs; [
 
     # build tools
+    lld
     gnumake
     qemu
     nasm
     grub2
     xorriso
     gdb
-
-    # libraries
-    gmp
-    mpfr
-    libmpc
-    isl
-    zstd
-
-    ];
+    clang_10
+  ];
 }
