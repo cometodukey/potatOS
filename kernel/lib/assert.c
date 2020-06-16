@@ -10,6 +10,7 @@ __assert_fail(const char *file,
 {
     kprintf("%s:%u: %s: Assertation '%s' failed.\r\n",
             file, line, func, expr);
+    do_stack_trace();
     for (;;) {
         hang();
     }

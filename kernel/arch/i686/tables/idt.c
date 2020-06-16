@@ -21,7 +21,7 @@ init_idt(void) {
 
     /* set all IDT entries */
     for (i = 0; i < LEN(idt_entries); ++i) {
-        idt_entry(i, (uint32_t)isr_common_stub, 0, 0x8e);
+        idt_entry(i, (uint32_t)isr_common_stub, 8, 0x8e);
     }
 
     /* CPU exception vectors */

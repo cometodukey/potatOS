@@ -17,7 +17,8 @@ static uint32_t __align(PAGE_SIZE) kernel_page_directory[1024];
 void
 init_paging(void) {
     size_t i;
-    uintptr_t addr;
+    uint32_t failed_addr = 0;
+    UNUSED(failed_addr);
 
     if (!has_pae_support()) {
         PANIC("PAE is not supported!");
@@ -25,16 +26,24 @@ init_paging(void) {
 
     /* zero each entry */
     for (i = 0; i < LEN(kernel_page_directory); ++i) {
-        kernel_page_directory[i] = !PAGE_PRESENT;
+        kernel_page_directory[i] = 0;
     }
 
-    /* identity map the first MiB */
-    for (i = 1; i < 1024; ++i) {
-        addr = i * PAGE_SIZE;
-        paging_map_page(kernel_page_directory, addr, addr, PAGE_RDWR);
+    /* identity map the first 32MiB (except the zero page!) */
+    // if (paging_map_range(kernel_page_directory, 0x1000, 0x1000,
+    //                      (MEM_BASE * 32) / PAGE_SIZE, PAGE_RDWR, &failed_addr) == GENERIC_ERR)
+    // {
+    //     PANIC("Failed to identity map %.8p", failed_addr);
+    // }
+    for (i = 0; i < 1024; ++i) {
+        uintptr_t addr = i * PAGE_SIZE;
+        if (paging_map_page(kernel_page_directory, addr, addr, PAGE_RDWR) == GENERIC_ERR) {
+            kprintf("Failed to map %.8p to %.8p\r\n", addr, addr);
+        }
     }
-    /* make the zero page not present */
-    // paging_map_page(kernel_page_directory, (uintptr_t)NULL, (uintptr_t)NULL, PAGE_RDWR);
+    /* unmap the zero page - no NULL pointers */
+    paging_unmap_page(kernel_page_directory, (uintptr_t)NULL, 0);
+
     kernel_page_directory[0] |= (PAGE_RDWR | PAGE_PRESENT);
 
     /* point CR3 to the kernels page directory */
@@ -42,6 +51,8 @@ init_paging(void) {
 
     /* enable paging and write protect read-only supervisor pages */
     write_cr0(read_cr0() | CR0_PG | CR0_WP);
+
+    *(volatile int *)0xa = 0xbadc0de;
 
     /* PAE, 4KB pages, no global pages */
     //write_cr4((read_cr4() | CR4_PAE) & ~(CR4_PSE | CR4_PGE));
@@ -119,4 +130,33 @@ paging_map_page(uint32_t *dir, uintptr_t phys, uintptr_t virt, int flags) {
     }
 
     return GENERIC_SUCCESS;
+}
+
+// FIXME - this causes some weird bugs
+KernelResult
+paging_map_range(uint32_t *dir, uintptr_t base_phys, uintptr_t base_virt,
+                 size_t len, int flags, uint32_t *failed_map) {
+    for (; len; --len, base_phys += PAGE_SIZE, base_virt += PAGE_SIZE) {
+        if (paging_map_page(dir, base_phys, base_virt, flags) == GENERIC_ERR) {
+            if (failed_map != NULL) {
+                *failed_map = base_virt;
+            }
+            return GENERIC_ERR;
+        }
+    }
+    return GENERIC_SUCCESS;
+}
+
+void
+paging_unmap_page(uint32_t *dir, uintptr_t virt, int free_phys) {
+    uint32_t *page = paging_get_page(dir, virt, 0, 0);
+    if (page != NULL) {
+        if (!(*page & PAGE_PRESENT)) {
+            PANIC("Attempt to unmap %.8p which is already unmapped!", virt);
+        }
+        if (free_phys) {
+            arch_pmm_free((void *)(*page & PAGE_MASK));
+        }
+        *page = 0;
+    }
 }

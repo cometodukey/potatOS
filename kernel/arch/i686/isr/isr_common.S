@@ -120,6 +120,7 @@ exception_common_stub:
 
     ; restore registers and return
     popad
+    add esp, 8
     iret
 
 ; exception handlers

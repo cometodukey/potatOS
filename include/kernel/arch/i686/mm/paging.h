@@ -19,6 +19,10 @@ enum {
 #define PAGE_FLAGS_MASK 0xFFF
 
 void init_paging();
+uint32_t *paging_get_page(uint32_t *dir, uintptr_t virt, int flags, int create);
 KernelResult paging_map_page(uint32_t *dir, uintptr_t phys, uintptr_t virt, int flags);
+KernelResult paging_map_range(uint32_t *dir, uintptr_t base_phys, uintptr_t base_virt,
+                              size_t len, int flags, uint32_t *failed_map);
+void paging_unmap_page(uint32_t *dir, uintptr_t virt, int phys_free);
 
 #endif /* __PAGING_H__ */
