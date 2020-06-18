@@ -45,8 +45,6 @@ extern exception_handler
 extern pic_irq
 extern pic_eoi
 
-%define GDT_KERNEL_DS 0x10
-
 ; iretq for 64 bit kernels
 
 %macro EXCEPTION_NO_ERR 1
@@ -90,37 +88,38 @@ isr_common_stub:
     iret
 
 exception_common_stub:
-    mov eax, dword [esp+8] ; FIXME - bizarre hack to get around infinite fault loop
     ; save registers
-    pushad
+    pusha
+    push ds
+    push es
+    push fs
+    push gs
 
-    ; load the kernel data segment
-    xor eax, eax
-    mov ax, ds
-    push eax
-    mov ax, GDT_KERNEL_DS
+    ; load kernel data segment
+    mov ax, 0x10
     mov ds, ax
+    ; mov ss, ax
     mov es, ax
     mov fs, ax
     mov gs, ax
-    mov ss, ax
 
-    ; pass a pointer to the registers to the handler
+    ; call the handler with a pointer to the registers
     push esp
     call exception_handler
     add esp, 4
 
-    ; restore the previous data segment
-    pop eax
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
-    mov ss, ax
+    ; restore registers
+    pop gs
+    pop fs
+    pop es
+    pop ds
+    popa
 
-    ; restore registers and return
-    popad
+    ; move stack pointer past error code and interrupt number
     add esp, 8
+
+    ; return from handler
+    ; this pops eip, cs, eflags, esp, ss
     iret
 
 ; exception handlers

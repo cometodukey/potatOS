@@ -44,11 +44,7 @@ static const char *names[] = {
 void
 exception_handler(const Registers *regs) {
     assert(regs->exception < LEN(names));
-    // TODO - save CR2 on PF
-    if (regs->exception == PAGE_FAULT) {
-        kprintf("CR2 = %08X\r\n", read_cr2());
+    if (regs->cs == 8) {
+        PANIC("Received exception %s with error code %d.", names[regs->exception], regs->error);
     }
-    kprintf("Received exception %s (%d) with error code %d. Faulting EIP %08X\r\n", names[regs->exception], regs->exception, regs->error, regs->eip);
-    dump_registers(regs);
-    do_stack_trace();
 }

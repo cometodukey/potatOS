@@ -1,4 +1,5 @@
 # potatOS
+
 [![Actions Status](https://github.com/cometodukey/potatOS/workflows/nix-build/badge.svg?branch=develop)](https://github.com/cometodukey/potatOS/actions)
 
 potatOS is a small operating system for i686.
@@ -30,3 +31,5 @@ Documentation can be found [here](docs/README.md).
 * Tidy up the Makefile
 * Handle exceptions better
 * Ensure panic/assert cannot receive interrupts
+* Higher half mapping
+* Stack with page guard

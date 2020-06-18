@@ -52,7 +52,15 @@ init_paging(void) {
     /* enable paging and write protect read-only supervisor pages */
     write_cr0(read_cr0() | CR0_PG | CR0_WP);
 
-    *(volatile int *)0xa = 0xbadc0de;
+    void *new = arch_pmm_zalloc();
+    if (paging_map_page(kernel_page_directory, (uintptr_t)new, UINT32_MAX/2, PAGE_RDWR) == GENERIC_ERR) {
+        kputs("failed to map page");
+    }
+    // *(volatile int *)(UINT32_MAX/2) = 0xbadc0de;
+    // if (paging_remap_page(kernel_page_directory, (uintptr_t)new, UINT32_MAX/2, 0) == GENERIC_ERR) {
+    //     kputs("failed to remap page");
+    // }
+    // *(volatile int *)(UINT32_MAX/2) = 0;
 
     /* PAE, 4KB pages, no global pages */
     //write_cr4((read_cr4() | CR4_PAE) & ~(CR4_PSE | CR4_PGE));
@@ -133,19 +141,19 @@ paging_map_page(uint32_t *dir, uintptr_t phys, uintptr_t virt, int flags) {
 }
 
 // FIXME - this causes some weird bugs
-KernelResult
-paging_map_range(uint32_t *dir, uintptr_t base_phys, uintptr_t base_virt,
-                 size_t len, int flags, uint32_t *failed_map) {
-    for (; len; --len, base_phys += PAGE_SIZE, base_virt += PAGE_SIZE) {
-        if (paging_map_page(dir, base_phys, base_virt, flags) == GENERIC_ERR) {
-            if (failed_map != NULL) {
-                *failed_map = base_virt;
-            }
-            return GENERIC_ERR;
-        }
-    }
-    return GENERIC_SUCCESS;
-}
+// KernelResult
+// paging_map_range(uint32_t *dir, uintptr_t base_phys, uintptr_t base_virt,
+//                  size_t len, int flags, uint32_t *failed_map) {
+//     for (; len; --len, base_phys += PAGE_SIZE, base_virt += PAGE_SIZE) {
+//         if (paging_map_page(dir, base_phys, base_virt, flags) == GENERIC_ERR) {
+//             if (failed_map != NULL) {
+//                 *failed_map = base_virt;
+//             }
+//             return GENERIC_ERR;
+//         }
+//     }
+//     return GENERIC_SUCCESS;
+// }
 
 void
 paging_unmap_page(uint32_t *dir, uintptr_t virt, int free_phys) {
@@ -159,4 +167,17 @@ paging_unmap_page(uint32_t *dir, uintptr_t virt, int free_phys) {
         }
         *page = 0;
     }
+}
+
+KernelResult
+paging_remap_page(uint32_t *dir, uintptr_t phys, uintptr_t virt, int flags) {
+    uint32_t *page = paging_get_page(dir, virt, flags, 0);
+    if (page == NULL || (*page & PAGE_MASK) == (uintptr_t)NULL) {
+        return GENERIC_ERR;
+    }
+    *page = phys | (flags & PAGE_FLAGS_MASK);
+    if (read_cr3() == (uintptr_t)dir) {
+        invlpg(virt);
+    }
+    return GENERIC_SUCCESS;
 }

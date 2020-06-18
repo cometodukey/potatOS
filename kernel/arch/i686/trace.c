@@ -12,6 +12,7 @@ arch_dump_registers(const Registers *regs) {
     kprintf("ESI = %08x EDI    = %08x ESP = %08x EBP = %08x\r\n", regs->esi, regs->edi, regs->esp, regs->ebp);
     kprintf("EIP = %08x EFLAGS = %08x\r\n", regs->eip, regs->eflags);
     kprintf("CS  = %8.4x DS     = %8.4x SS  = %8.4x\r\n", regs->cs,  regs->ds, regs->ss);
+    kprintf("ES  = %8.4x FS     = %8.4x GS  = %8.4x\r\n", regs->es,  regs->fs, regs->gs);
 }
 
 static char *
